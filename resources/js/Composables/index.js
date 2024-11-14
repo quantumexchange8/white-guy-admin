@@ -167,20 +167,12 @@ export function setDateTimeWithOffset(withTime = false) {
     return currentDate.format('YYYY-MM-DD');
 }
 
-export function convertToHumanReadable(str) {
-    var i, frags = str.split(/_|-/);
-    for (i=0; i<frags.length; i++) {
-      frags[i] = frags[i].charAt(0).toUpperCase() + frags[i].slice(1);
-    }
-    return frags.join(' ');
-}
-
 export function formatToUserTimezone(date, timezone, withTime = false) {
     const convertedDate = dayjs(date).tz(timezone);
 
     if (withTime) {
-        return convertedDate.format('DD/MM/YYYY HH:mm:ss');
+        return convertedDate.format('YYYY/MM/DD HH:mm:ss');
     }
 
-    return convertedDate.format('DD/MM/YYYY');
+    return convertedDate.format('YYYY/MM/DD');
 }

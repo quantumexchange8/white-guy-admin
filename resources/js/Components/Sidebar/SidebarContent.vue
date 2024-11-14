@@ -73,7 +73,7 @@ const pendingBonusWithdrawal = ref(0);
             <SidebarCollapsibleItem
                 :title="$t('public.leads')"
                 :href="route('crm.lead.index')"
-                :active="route().current('crm.lead.index')"
+                :active="route().current('crm.lead.*')"
             />
 
 

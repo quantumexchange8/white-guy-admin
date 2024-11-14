@@ -786,11 +786,11 @@ class LeadController extends Controller
 
     public function getLeads(Request $request)
     {
-        // Define query with eager loading for related models
+        // Initialize the query with eager loading for related models
         $query = Lead::with([
             'leadCreator:id,username,site_id',
             'leadCreator.site:id,name',
-            'assignee:id,full_name,site_id',
+            'assignee:id,username,site_id',
             'assignee.site:id,name',
             'leadnotes' => function ($query) {
                 $query->select('id', 'lead_id', 'note', 'created_by_id');
@@ -804,25 +804,52 @@ class LeadController extends Controller
         ->select([
             'id', 'date', 'first_name', 'last_name', 'email', 'created_at', 'assignee_id', 'country', 'vc', 'phone_number', 
             'data_source', 'contacted_at', 'give_up_at', 'data_code', 'data_type'
-        ])
-        ->latest(); // Order results
+        ]);
     
-        // Handle pagination: PrimeVue uses 0-based pages, so add 1 for Laravel
-        $rowsPerPage = $request->input('rows', 15);  // Default to 15 if 'rows' not provided
-        $currentPage = $request->input('page', 0) + 1; // Make it 1-based for Laravel
+        // Handle search functionality
+        $search = $request->input('search');
+        if ($search) {
+            $query->where(function ($query) use ($search) {
+                $query->where('first_name', 'like', '%' . $search . '%')
+                    ->orWhere('last_name', 'like', '%' . $search . '%')
+                    ->orWhere('email', 'like', '%' . $search . '%')
+                    ->orWhere('phone_number', 'like', '%' . $search . '%')
+                    ->orWhere('country', 'like', '%' . $search . '%');
+            });
+        }
+
+        // Handle date range filtering
+        $startDate = $request->input('startDate');
+        $endDate = $request->input('endDate');
+
+        // Apply date range filtering if both dates are present
+        if ($startDate && $endDate) {
+            $query->whereBetween('created_at', [$startDate, $endDate]);
+        } elseif ($startDate) {
+            $query->where('created_at', '>=', $startDate);
+        } elseif ($endDate) {
+            $query->where('created_at', '<=', $endDate);
+        }
+    
+        // Handle sorting
+        $sortField = $request->input('sortField', 'created_at'); // Default to 'created_at'
+        $sortOrder = $request->input('sortOrder', 1); // 1 for ascending, -1 for descending
+        $query->orderBy($sortField, $sortOrder == 1 ? 'asc' : 'desc');
+    
+        // Get total count before pagination
+        $totalRecords = $query->count();
+
+        // Handle pagination
+        $rowsPerPage = $request->input('rows', 15); // Default to 15 if 'rows' not provided
+        $currentPage = $request->input('page', 0) + 1; // Laravel uses 1-based page numbers, PrimeVue uses 0-based
     
         // Paginate the query
         $data = $query->simplePaginate($rowsPerPage, ['*'], 'page', $currentPage);
     
-        // Cache the total row count for performance optimization
-        $totalRows = Cache::remember('leads_total_count', 600, function () {
-            return Lead::count();
-        });
-    
         // Prepare response data for PrimeVue DataTable
         return response()->json([
             'data' => $data->items(),
-            'totalRecords' => $totalRows, // Matches PrimeVue's 'totalRecords' field
+            'totalRecords' => $totalRecords, // Matches PrimeVue's 'totalRecords' field
             'current_page' => $data->currentPage(),
             'first_page_url' => $data->url(1),
             'next_page_url' => $data->hasMorePages() ? $data->nextPageUrl() : null,
@@ -833,7 +860,79 @@ class LeadController extends Controller
             'to' => $data->lastItem(),
         ]);
     }
-                                    
+
+    public function detail($id)
+    {
+        $lead = Lead::find($id);
+
+        return Inertia::render('CRM/Leads/LeadDetails/LeadDetails', [
+            'lead' => $lead,
+        ]);
+    }
+
+    public function getLeadData(Request $request)
+    {
+        $lead = Lead::with([
+            'leadCreator:id,username,site_id',
+            'leadCreator.site:id,name',
+            'assignee:id,username,site_id',
+            'assignee.site:id,name',
+            'contactOutcome:id,title',
+            'stage:id,title',
+            'appointmentLabel:id,title'
+        ])
+        ->find($request->id);
+
+        $leadFront = Lead::find($request->id)->leadfront;
+        // $userData = [
+        //     'id' => $user->id,
+        //     'name' => $user->first_name,
+        //     'email' => $user->email,
+        //     'dial_code' => $user->dial_code,
+        //     'phone' => $user->phone,
+        //     'upline_id' => $user->upline_id,
+        //     'role' => $user->role,
+        //     'id_number' => $user->id_number,
+        //     'status' => $user->status,
+        //     'profile_photo' => $user->getFirstMediaUrl('profile_photo'),
+        //     'team_id' => $user->teamHasUser->team_id ?? null,
+        //     'team_name' => $user->teamHasUser->team->name ?? null,
+        //     'team_color' => $user->teamHasUser->team->color ?? null,
+        //     'upline_name' => $user->upline->first_name ?? null,
+        //     'total_direct_member' => $user->directChildren->where('role', 'member')->count(),
+        //     'total_direct_agent' => $user->directChildren->where('role', 'agent')->count(),
+        //     'kyc_verification' => $user->getFirstMedia('kyc_verification'),
+        //     'kyc_approved_at' => $user->kyc_approved_at,
+        // ];
+
+        return response()->json([
+            'leadDetail' => $lead,
+            'leadFront' => $leadFront
+        ]);
+    }
+
+    public function getLeadNotes(Request $request)
+    {
+        // $existingLeadNotes = LeadNote::where('linked_lead', $id)
+        //                                 ->orderBy('created_at', 'desc')
+        //                                 ->get()
+        //                                 ->map(function ($note) {
+        //                                     $note['source'] = 'lead_note';
+        //                                     return $note;
+        //                                 });
+        $existingLeadNotes = LeadNote::where('lead_id', $request->id)
+                                        ->with(['leadNoteCreator:id,username,site_id', 'leadNoteCreator.site:id,name'])
+                                        ->orderByDesc('id')
+                                        ->get();
+
+        foreach($existingLeadNotes as $key=>$value) {
+            $existingLeadNotes[$key]->user_editable = boolval($existingLeadNotes[$key]->user_editable);
+        }
+
+
+        return response()->json($existingLeadNotes);
+    }
+
     public function applyFilterCondition($query, $filter, $filteredIdArr) {
         switch ($filter['condition']) {
             case 'not_contain':
@@ -1225,28 +1324,6 @@ class LeadController extends Controller
     public function getLeadFront(string $id)
     {
         return response()->json(Lead::find($id)->leadfront);
-    }
-
-    public function getLeadNotes(string $id)
-    {
-        // $existingLeadNotes = LeadNote::where('linked_lead', $id)
-        //                                 ->orderBy('created_at', 'desc')
-        //                                 ->get()
-        //                                 ->map(function ($note) {
-        //                                     $note['source'] = 'lead_note';
-        //                                     return $note;
-        //                                 });
-        $existingLeadNotes = LeadNote::where('lead_id', $id)
-                                        ->with(['leadNoteCreator:id,username,site_id', 'leadNoteCreator.site:id,name'])
-                                        ->orderByDesc('id')
-                                        ->get();
-
-        foreach($existingLeadNotes as $key=>$value) {
-            $existingLeadNotes[$key]->user_editable = boolval($existingLeadNotes[$key]->user_editable);
-        }
-
-
-        return response()->json($existingLeadNotes);
     }
 
     // public function getLeadChangelogs(string $id)

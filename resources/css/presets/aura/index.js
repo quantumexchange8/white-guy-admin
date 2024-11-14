@@ -88,6 +88,9 @@ import progressspinner from './progressspinner';
 import ripple from './ripple';
 import tag from './tag';
 import terminal from './terminal';
+import accordionpanel from './accordionpanel/index.js';
+import accordionheader from './accordionheader/index.js';
+import accordioncontent from './accordioncontent/index.js';
 
 export default {
     global,
@@ -134,6 +137,9 @@ export default {
     treetable,
     timeline,
     accordion,
+    accordionpanel,
+    accordionheader,
+    accordioncontent,
     card,
     deferred,
     divider,

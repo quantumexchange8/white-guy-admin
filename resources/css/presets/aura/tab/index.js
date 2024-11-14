@@ -12,7 +12,7 @@ export default {
       'outline-transparent',
       'font-semibold',
       {
-        'text-gray-700 hover:text-primary-500': !context.active,
+        'text-gray-700 dark:text-gray-300 hover:text-primary-500': !context.active,
         'text-primary-500 border-b-2 border-primary-500': context.active,
         'opacity-60 cursor-default user-select-none select-none pointer-events-none': props == null ? void 0 : props.disabled
       },
