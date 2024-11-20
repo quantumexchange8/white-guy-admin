@@ -12,7 +12,7 @@ export default {
 
             // Color
             // 'bg-white',
-            'text-gray-700',
+            'text-gray-700 dark:text-gray-300',
 
             'text-sm',
         ]
@@ -43,11 +43,11 @@ export default {
             'w-11 h-11',
 
             // Color
-            'text-gray-700',
+            'text-gray-700 dark:text-gray-300',
 
             // State
             {
-                'hover:bg-gray-100': !context.disabled,
+                'hover:bg-gray-100 dark:hover:bg-gray-600': !context.disabled,
                 'focus:outline-none focus:outline-offset-0': !context.disabled
             },
 
@@ -73,11 +73,11 @@ export default {
             'w-11 h-11',
 
             // Color
-            'text-gray-700',
+            'text-gray-700 dark:text-gray-300',
 
             // State
             {
-                'hover:bg-gray-100': !context.disabled,
+                'hover:bg-gray-100 dark:hover:bg-gray-600': !context.disabled,
                 'focus:outline-none focus:outline-offset-0': !context.disabled
             },
 
@@ -103,11 +103,11 @@ export default {
             'w-11 h-11',
 
             // Color
-            'text-gray-700',
+            'text-gray-700 dark:text-gray-300',
 
             // State
             {
-                'hover:bg-gray-100': !context.disabled,
+                'hover:bg-gray-100 dark:hover:bg-gray-600': !context.disabled,
                 'focus:outline-none focus:outline-offset-0': !context.disabled
             },
 
@@ -133,11 +133,11 @@ export default {
             'w-11 h-11',
 
             // Color
-            'text-gray-700',
+            'text-gray-700 dark:text-gray-300',
 
             // State
             {
-                'hover:bg-gray-100': !context.disabled,
+                'hover:bg-gray-100 dark:hover:bg-gray-600': !context.disabled,
                 'focus:outline-none focus:outline-offset-0': !context.disabled
             },
 
@@ -172,13 +172,13 @@ export default {
             'w-11 h-11',
 
             // Color
-            'text-gray-700',
+            'text-gray-700 dark:text-gray-300',
 
             // State
             {
-                'hover:bg-gray-100': !context.disabled,
+                'hover:bg-gray-100 dark:hover:bg-gray-600': !context.disabled,
                 'focus:outline-none focus:outline-offset-0': !context.disabled,
-                'bg-primary-100 hover:bg-primary-100 text-primary-600': context.active
+                'bg-primary-100 dark:bg-primary-700 hover:bg-primary-100 dark:hover:bg-primary-600 text-primary-600 dark:text-primary-100': context.active
             },
 
             // Transition

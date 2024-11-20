@@ -1,6 +1,6 @@
 export default {
     root: {
-        class: ['flex', 'flex-col', 'border-b', 'border-surface-200', 'dark:border-surface-700'],
+        class: ['flex', 'flex-col',],
     },
     header: {
         class: [

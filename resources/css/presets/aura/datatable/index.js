@@ -53,9 +53,9 @@ export default {
             props.showGridlines ? 'border-x border-t border-b-0' : 'border-y border-x-0',
 
             // Color
-            'bg-white',
+            'bg-white dark:bg-gray-700',
             'border-transparent',
-            'text-gray-700'
+            'text-gray-700 dark:text-gray-100'
         ]
     }),
     table: {
@@ -64,7 +64,7 @@ export default {
     thead: ({ context }) => ({
         class: [
             {
-                'bg-white top-0 z-10 sticky': context.scrollable
+                'bg-white dark:bg-gray-700 top-0 z-10 sticky': context.scrollable
             }
         ]
     }),
@@ -73,18 +73,18 @@ export default {
             {
                 'sticky z-20': instance.frozenRow && context.scrollable
             },
-            'bg-white'
+            'bg-white dark:bg-gray-700'
         ]
     }),
     tfoot: ({ context }) => ({
         class: [
             {
-                'bg-white bottom-0 z-0': context.scrollable
+                'bg-white dark:bg-gray-700 bottom-0 z-0': context.scrollable
             }
         ]
     }),
     emptymessagecell: {
-        class: 'bg-white'
+        class: 'bg-white dark:bg-gray-700'
     },    
     footer: {
         class: [
@@ -97,15 +97,15 @@ export default {
             'p-4',
 
             // Color
-            'bg-white',
-            'border-gray-200',
-            'text-gray-700'
+            'bg-white dark:bg-gray-700',
+            'border-gray-200 dark:border-gray-500',
+            'text-gray-700 dark:text-gray-100'
         ]
     },
     column: {
         headerCell: ({ context, props }) => ({
             class: [
-                'text-gray-950',
+                'text-gray-950 dark:text-gray-100',
                 'font-bold',
                 'text-xs',
                 'uppercase',
@@ -126,11 +126,11 @@ export default {
                 context?.size === 'small' ? 'py-[0.375rem] px-2' : context?.size === 'large' ? 'py-[0.9375rem] px-5' : 'py-4 px-3',
 
                 // Color
-                (props.sortable === '' || props.sortable) && context.sorted ? 'bg-primary-100 text-primary-600' : 'bg-gray-50 text-gray-700',
+                (props.sortable === '' || props.sortable) && context.sorted ? 'bg-primary-100 dark:bg-primary-700 text-primary-600 dark:text-primary-100' : 'bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-100',
                 'border-transparent ',
 
                 // States
-                { 'hover:bg-gray-100': (props.sortable === '' || props.sortable) && !context?.sorted },
+                { 'hover:bg-gray-100 dark:hover:bg-gray-600': (props.sortable === '' || props.sortable) && !context?.sorted },
                 'focus-visible:outline-none focus-visible:outline-offset-0 focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-primary-500',
 
                 // Transition
@@ -147,12 +147,12 @@ export default {
             class: 'flex items-center gap-2',
         },
         sort: ({ context }) => ({
-            class: [context.sorted ? 'text-primary-600' : 'text-gray-700']
+            class: [context.sorted ? 'text-primary-600 dark:text-primary-100' : 'text-gray-700 dark:text-gray-300']
         }),
         bodyCell: ({ props, context, state, parent }) => ({
             class: [
                 // Font
-                'text-gray-950',
+                'text-gray-950 dark:text-gray-100',
                 'text-sm',
 
                 //Position
@@ -165,7 +165,7 @@ export default {
                 // Shape
                 'border-0 border-b border-solid',
                 { 'first:border-l border-r border-b': context?.showGridlines },
-                { 'bg-white': parent.instance.frozenRow || props.frozen || props.frozen === '' },
+                { 'bg-white dark:bg-gray-700': parent.instance.frozenRow || props.frozen || props.frozen === '' },
 
                 // Spacing
                 { 'py-[0.375rem] px-2': context?.size === 'small' && !state['d_editing'] },
@@ -174,7 +174,7 @@ export default {
                 { 'py-[0.6rem] px-2': state['d_editing'] },
 
                 // Color
-                'border-gray-100',
+                'border-gray-100 dark:border-gray-300',
 
                 {
                     'overflow-hidden whitespace-nowrap border-y bg-clip-padding': parent.instance?.$parentInstance?.$parentInstance?.resizableColumns // Resizable
@@ -198,15 +198,15 @@ export default {
                 context?.size === 'small' ? 'p-2' : context?.size === 'large' ? 'p-5' : 'p-4',
 
                 // Color
-                'border-gray-100',
-                'text-gray-950',
-                'bg-white'
+                'border-gray-100 dark:border-gray-300',
+                'text-gray-950 dark:text-gray-100',
+                'bg-white dark:bg-gray-700'
             ]
         }),
         sortIcon: ({ context }) => ({
             class: [
                 'w-4 h-4',
-                context.sorted ? 'text-inherit' : 'text-gray-700'
+                context.sorted ? 'text-inherit' : 'text-gray-700 dark:text-gray-100'
 
             ]
         }),
@@ -417,12 +417,12 @@ export default {
         class: [
             // Color
             { 'bg-highlight': context.selected && props.highlightOnSelect },
-            { 'bg-white text-gray-600': !context.selected },
-            { 'font-bold bg-white z-20': props.frozenRow },
-            { 'odd:bg-white odd:text-gray-600 even:bg-gray-50 even:text-gray-600': context.stripedRows },
+            { 'bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-100': !context.selected },
+            { 'font-bold bg-white dark:bg-gray-700 z-20': props.frozenRow },
+            { 'odd:bg-white dark:odd:bg-gray-600 odd:text-gray-600 dark:odd:text-gray-100 even:bg-gray-50 dark:even:bg-gray-500 even:text-gray-600 dark:even:text-gray-100': context.stripedRows },
 
             // State
-            { 'hover:bg-gray-50 hover:text-gray-600': props.selectionMode && !context.selected },
+            { 'hover:bg-gray-50 dark:hover:bg-gray-500 hover:text-gray-600 dark:hover:text-gray-100': props.selectionMode && !context.selected },
 
             // Transition
             { 'transition duration-200': (props.selectionMode && !context.selected) || props.rowHover },

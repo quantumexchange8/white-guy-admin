@@ -58,8 +58,8 @@ const leave = (el) => {
                     class="relative block w-5 h-5 ml-auto"
                     :class="[
                         {
-                            'text-primary-500': active,
-                            'text-gray-700 focus:bg-gray-100': !active,
+                            'text-primary-500 dark:text-primary-100': active,
+                            'text-gray-700 dark:text-gray-100 focus:bg-gray-100 dark:focus:bg-gray-600': !active,
                         },
                     ]"
                 >

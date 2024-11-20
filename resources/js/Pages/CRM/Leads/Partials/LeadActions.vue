@@ -98,7 +98,7 @@ const requireConfirmation = (action_type) => {
             aria-haspopup="true"
             aria-controls="overlay_tmenu"
         >
-            <IconDotsVertical size="16" stroke-width="1.25" color="#667085" />
+            <IconDotsVertical size="16" stroke-width="1.25" class="text-gray-700 dark:text-gray-300" />
         </Button>
         <TieredMenu ref="menu" id="overlay_tmenu" :model="items" popup>
             <template #item="{ item, props, hasSubmenu }">

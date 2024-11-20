@@ -804,7 +804,8 @@ class LeadController extends Controller
         ->select([
             'id', 'date', 'first_name', 'last_name', 'email', 'created_at', 'assignee_id', 'country', 'vc', 'phone_number', 
             'data_source', 'contacted_at', 'give_up_at', 'data_code', 'data_type'
-        ]);
+        ])
+        ->latest();
     
         // Handle search functionality
         $search = $request->input('search');

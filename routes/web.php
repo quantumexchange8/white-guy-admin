@@ -1,18 +1,14 @@
 <?php
 
-use App\Http\Controllers\LeadController;
-use App\Http\Controllers\ProfileController;
-use Illuminate\Foundation\Application;
-use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Foundation\Application;
+use App\Http\Controllers\LeadController;
+use App\Http\Controllers\MemberController;
+use App\Http\Controllers\ProfileController;
 
 Route::get('/', function () {
-    return Inertia::render('Welcome', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
-    ]);
+    return redirect(route('login'));
 });
 
 Route::get('/dashboard', function () {
@@ -34,6 +30,15 @@ Route::get('/data/leads/categories', [LeadController::class, 'getCategories']);
      * ==============================
      */
     Route::prefix('crm')->group(callback: function () {
+        Route::prefix('member')->group(callback: function () {
+            Route::get('/', [MemberController::class, 'index'])->name('crm.member.index');
+    
+            Route::get('/detail/{id}', [LeadController::class, 'detail'])->name('crm.member.detail');
+            Route::get('/getLeadData', [LeadController::class, 'getLeadData'])->name('crm.member.getLeadData');
+            Route::get('/getLeadNotes', [LeadController::class, 'getLeadNotes'])->name('crm.member.getLeadNotes');
+
+        });
+
         Route::prefix('lead')->group(callback: function () {
             Route::get('/', [LeadController::class, 'index'])->name('crm.lead.index');
     

@@ -36,14 +36,14 @@ const Tag = !props.external ? Link : 'a'
         :class="[
             'p-3 flex gap-3 items-center rounded transition-colors w-full focus:outline-none',
             {
-                'text-gray-700 hover:bg-gray-100 focus:bg-gray-100':
+                'text-gray-700 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-600 focus:bg-gray-100 dark:focus:bg-gray-600':
                     !active,
-                'text-primary-600 bg-primary-100':
+                'text-primary-600 dark:text-primary-100 bg-primary-100 dark:bg-primary-700':
                     active,
             },
         ]"
     >
-        <div class="max-w-5 text-primary-500">
+        <div class="max-w-5 text-primary-500 dark:text-primary-100">
             <slot name="icon">
                 <EmptyCircleIcon aria-hidden="true" class="flex-shrink-0 w-5 h-5" />
             </slot>
@@ -58,7 +58,7 @@ const Tag = !props.external ? Link : 'a'
             </span>
             <Badge
                 v-if="pendingCounts > 0 && (sidebarState.isOpen || sidebarState.isHovered)"
-                class="text-xs text-white"
+                class="text-xs text-white dark:text-gray-100"
                 :pill="true"
             >
                 {{ pendingCounts }}
@@ -71,14 +71,14 @@ const Tag = !props.external ? Link : 'a'
         :class="[
             'p-3 flex gap-3 items-center rounded transition-colors w-full focus:outline-none',
             {
-                'text-gray-700 hover:bg-gray-100 focus:bg-gray-100':
+                'text-gray-700 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-600 focus:bg-gray-100 dark:focus:bg-gray-600':
                     !active,
-                'text-primary-600 bg-primary-100':
+                'text-primary-600 dark:text-primary-100 bg-primary-100 dark:bg-primary-700':
                     active,
             },
         ]"
     >
-        <div class="max-w-5 text-primary-500">
+        <div class="max-w-5 text-primary-500 dark:text-primary-100">
             <slot name="icon">
                 <EmptyCircleIcon aria-hidden="true" class="flex-shrink-0 w-5 h-5" />
             </slot>

@@ -10,9 +10,9 @@ export default {
             'm-0',
 
             // Color
-            'bg-white',
+            'bg-white dark:bg-gray-800',
             '[&:last-child]:border-b',
-            'border-gray-200',
+            'border-gray-200 dark:border-gray-700',
 
             // Transitions
             'transform',
@@ -44,19 +44,19 @@ export default {
             'rounded-tr-lg',
 
             // Colors
-            'text-gray-700',
+            'text-gray-700 dark:text-gray-100',
             'border border-b border-solid',
-            'border-gray-200'
+            'border-gray-200 dark:border-gray-700'
         ]
     },
     title: {
-        class: ['font-semibold text-gray-950 truncate md:text-lg']
+        class: ['font-semibold text-gray-950 dark:text-gray-100 truncate md:text-lg']
     },
     headerActions: {
         class: [
             'flex items-center',
-            '[&>[data-pc-name=pcclosebutton]]:text-gray-700',
-            '[&>[data-pc-name=pcclosebutton]]:hover:bg-gray-100',
+            '[&>[data-pc-name=pcclosebutton]]:text-gray-700 dark:[&>[data-pc-name=pcclosebutton]]:text-gray-100',
+            '[&>[data-pc-name=pcclosebutton]]:hover:bg-gray-100 dark:[&>[data-pc-name=pcclosebutton]]:hover:bg-gray-600',
             '[&>[data-pc-name=pcclosebutton]]:border-0',
             '[&>[data-pc-name=pcclosebutton]]:ring-0',
             '[&>[data-pc-name=pcclosebutton]]:outline-none',
@@ -77,9 +77,9 @@ export default {
             },
 
             // Colors
-            'text-gray-700',
+            'text-gray-700 dark:text-gray-100',
             'border border-t-0 border-b-0',
-            'border-gray-200',
+            'border-gray-200 dark:border-gray-700',
 
             // Misc
             'overflow-y-auto'
@@ -102,10 +102,10 @@ export default {
             'rounded-b-lg',
 
             // Colors
-            'bg-white',
-            'text-gray-700',
+            'bg-white dark:bg-gray-800',
+            'text-gray-700 dark:text-gray-100',
             'border border-t-0 border-b-0',
-            'border-gray-200'
+            'border-gray-200 dark:border-gray-700'
         ]
     },
     mask: ({ props }) => ({

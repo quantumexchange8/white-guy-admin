@@ -104,7 +104,7 @@ const submitForm = () => {
         <div class="flex flex-col justify-center items-center gap-4 self-stretch">
             <div class="flex justify-between items-start self-stretch">
                 <span class="text-gray-950 dark:text-white font-bold text-xxl">{{ $t('public.lead_notes') }}</span>
-                <Button
+                <!-- <Button
                     type="button"
                     iconOnly
                     size="base"
@@ -114,40 +114,61 @@ const submitForm = () => {
                     :disabled="!leadNotes"
                 >
                     <IconPencilMinus size="20" />
-                </Button>
+                </Button> -->
             </div>
         </div>
         <div class="h-[1px] self-stretch bg-gray-200" />
         <!-- Accordion to display lead notes -->
-        <Accordion multiple class="w-full max-h-[800px] 2xl:max-h-[700px] overflow-auto">
+        <Accordion multiple class="w-full max-h-[900px] 2xl:max-h-[800px] overflow-auto">
             <AccordionPanel 
                 v-for="(note, index) in leadNotes" 
                 :key="note.id" 
                 :value="index"
             >
-                <div class="flex flex-col items-center pt-2 gap-1">
-                    <h3 class="self-stretch text-gray-950 dark:text-gray-100 font-semibold">{{ note.note }}</h3>
-                    <!-- <span class="self-stretch text-sm text-gray-500 dark:text-gray-400">{{ formatToUserTimezone(note.created_at, user.timezone, true) }}</span> -->
-                    <span class="self-stretch text-sm text-gray-500 dark:text-gray-400">{{ note.created_at }}</span>
-                </div>
-                <AccordionHeader class="px-2">{{ `${$t('public.lead_note_details')}&nbsp;(${note.id})` }}</AccordionHeader>
-                <AccordionContent>
-                    <div class="w-full flex flex-col items-center px-2">
-                        <div class="w-full flex items-center gap-2">
-                            <span class="truncate text-gray-950 dark:text-gray-100 font-semibold">{{ $t('public.user_editable') }}:</span>
-                            <component 
-                                :is="note.user_editable ? h(IconCircleCheck) : h(IconCircleX)" 
-                                size="24" 
-                                stroke-width="1.25" 
-                                :class="note.user_editable ? 'text-success-700' : 'text-error-500'" 
-                            />
+                <div class="w-full flex gap-2">
+                    <!-- dot on the top-left -->
+                    <div class="flex flex-col items-center">
+                        <div 
+                            class="w-3 h-3 rounded-full grow-0 shrink-0"
+                            :class="`bg-${note.color}-500`"
+                        >
                         </div>
-                        <div class="w-full flex items-center gap-2">
-                            <span class="truncate text-gray-950 dark:text-gray-100 font-semibold">{{ $t('public.created_by') }}:</span>
-                            <span class="truncate text-primary-700 font-bold">{{ note.lead_note_creator.username || '' }} ({{ note.lead_note_creator.site.name || '' }})</span>
-                        </div>
+                        <div class="w-0.5 h-full bg-gray-200 dark:bg-gray-500 "></div>
                     </div>
-                </AccordionContent>
+                    
+                    <div
+                        class="w-full flex flex-col border-b-gray-200 dark:border-b-gray-500"
+                        :class="{
+                            'py-2 border-b': index !== 0 && index !== leadNotes.length - 1,
+                            'pb-2 border-b': index === 0,
+                            'pt-2': index === leadNotes.length - 1
+                        }"
+                    >
+                        <div class="flex flex-col items-center pt-2 gap-1">
+                            <h3 class="self-stretch text-gray-950 dark:text-gray-100 font-semibold">{{ note.note }}</h3>
+                            <!-- <span class="self-stretch text-sm text-gray-500 dark:text-gray-400">{{ formatToUserTimezone(note.created_at, user.timezone, true) }}</span> -->
+                            <span class="self-stretch text-sm text-gray-500 dark:text-gray-400">{{ note.created_at }}</span>
+                        </div>
+                        <AccordionHeader class="px-2">{{ `${$t('public.lead_note_details')}&nbsp;(${note.id})` }}</AccordionHeader>
+                        <AccordionContent>
+                            <div class="w-full flex flex-col items-center p-2">
+                                <div class="w-full flex items-center gap-2">
+                                    <span class="truncate text-gray-950 dark:text-gray-100 font-semibold">{{ $t('public.user_editable') }}:</span>
+                                    <component 
+                                        :is="note.user_editable ? h(IconCircleCheck) : h(IconCircleX)" 
+                                        size="24" 
+                                        stroke-width="1.25" 
+                                        :class="note.user_editable ? 'text-success-700' : 'text-error-500'" 
+                                    />
+                                </div>
+                                <div class="w-full flex items-center gap-2">
+                                    <span class="truncate text-gray-950 dark:text-gray-100 font-semibold">{{ $t('public.created_by') }}:</span>
+                                    <span class="truncate text-primary-700 font-bold">{{ note.lead_note_creator.username || '' }} ({{ note.lead_note_creator.site.name || '' }})</span>
+                                </div>
+                            </div>
+                        </AccordionContent>
+                    </div>
+                </div>
             </AccordionPanel>
         </Accordion>
     </div>

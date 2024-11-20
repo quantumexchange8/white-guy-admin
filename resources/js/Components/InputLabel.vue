@@ -11,7 +11,7 @@ defineProps({
     <label
         class="block text-sm"
         :class="{
-            'text-gray-700': !invalid,
+            'text-gray-700 dark:text-gray-100': !invalid,
             'text-error-600': invalid
         }"
     >

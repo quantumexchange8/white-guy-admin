@@ -28,8 +28,8 @@ const Tag = external ? 'a' : Link
         :class="[
             'text-sm rounded hover:cursor-pointer mt-1 ',
             {
-                'bg-primary-100': active,
-                'hover:bg-gray-100 focus:bg-gray-100': !active,
+                'bg-primary-100 dark:bg-primary-700': active,
+                'hover:bg-gray-100 dark:hover:bg-gray-600 focus:bg-gray-100 dark:focus:bg-gray-600': !active,
             }
         ]"
     >
@@ -40,8 +40,8 @@ const Tag = external ? 'a' : Link
             :class="[
                 'p-3 flex gap-3 rounded items-center w-full focus:outline-none',
                 {
-                    'text-primary-600': active,
-                    'text-gray-700 focus:bg-gray-100': !active,
+                    'text-primary-600 dark:text-primary-100': active,
+                    'text-gray-700 dark:text-gray-100 focus:bg-gray-100 dark:focus:bg-gray-600': !active,
                 },
             ]"
         >
