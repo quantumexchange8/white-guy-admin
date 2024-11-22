@@ -38,7 +38,7 @@ const user = usePage().props.auth.user;
 
 const props = defineProps({
     leadDetail: Object,
-    // countries: Array,
+    isLoading: Boolean,
 })
 
 const visible = ref(false)
@@ -136,7 +136,7 @@ function updateType(event) {
     <div class="w-full flex flex-col items-center p-3 gap-3 self-stretch rounded-lg bg-white dark:bg-gray-800 shadow-card md:px-6 md:py-5">
         <div class="flex flex-col justify-center items-center gap-4 self-stretch">
             <div class="flex justify-between items-start self-stretch">
-                <span class="text-gray-950 dark:text-gray-100 font-bold text-xxl">{{ $t('public.lead_details') }}</span>
+                <span class="w-full text-gray-950 dark:text-gray-100 font-bold text-xxl break-words">{{ $t('public.lead_details') }}</span>
                 <Button
                     type="button"
                     iconOnly
@@ -149,18 +149,21 @@ function updateType(event) {
                     <IconPencilMinus size="20" />
                 </Button>
             </div>
-            <div v-if="leadDetail" class="flex flex-col items-start gap-1 self-stretch">
-                <div class="flex flex-col items-start gap-1 self-stretch">
+            <div v-if="isLoading" class="animate-pulse flex flex-col items-start gap-1.5 self-stretch">
+                <div class="h-4 bg-gray-200 rounded-full w-48 my-2 md:my-3"></div>
+            </div>
+            <div v-else class="flex flex-col items-start gap-1 self-stretch">
+                <div class="grid items-start gap-1 self-stretch">
                     <span class="w-full truncate self-stretch text-gray-950 dark:text-gray-100 text-xl font-bold">
-                        {{ `${leadDetail.last_name}&nbsp;${leadDetail.first_name}` }}
+                        {{ leadDetail.last_name && leadDetail.first_name ? `${leadDetail.last_name} ${leadDetail.first_name}` : '-' }}
                     </span>
                     <span class="w-full truncate self-stretch text-gray-500 dark:text-gray-100 text-sm font-bold">
-                        {{ leadDetail.email }}
+                        {{ leadDetail?.email ? leadDetail.email : '-' }}
                     </span>
-                    <div class="flex items-start gap-1 self-stretch">
+                    <div class="w-full truncate flex items-start gap-1 self-stretch">
                         <IconPhone size="20" stroke-width="1.25" class="text-gray-500" />
                         <span class="w-full truncate self-stretch text-gray-500 dark:text-gray-100 text-sm font-bold">
-                            {{ leadDetail.phone_number }}
+                            {{ leadDetail?.phone_number ? leadDetail.phone_number : '-' }}
                         </span>
                     </div>
                 </div>
@@ -175,9 +178,6 @@ function updateType(event) {
                         </Tab>
                     </TabList>
                 </Tabs>
-            </div>
-            <div v-else class="animate-pulse flex flex-col items-start gap-1.5 self-stretch">
-                <div class="h-4 bg-gray-200 rounded-full w-48 my-2 md:my-3"></div>
             </div>
         </div>
         <div class="h-[1px] self-stretch bg-gray-200" />

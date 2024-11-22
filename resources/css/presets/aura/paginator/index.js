@@ -24,7 +24,7 @@ export default {
             // Flex & Alignment
             'inline-flex items-center justify-center gap-x-1 gap-y-3',
 
-            '[&>[data-pc-section=current]]:text-gray-500',
+            '[&>[data-pc-section=current]]:text-gray-500 dark:[&>[data-pc-section=current]]:text-gray-300',
             '[&>[data-pc-section=current]]:text-center',
             '[&>[data-pc-section=current]]:text-sm',
         ],
@@ -47,7 +47,7 @@ export default {
 
             // State
             {
-                'hover:bg-gray-100 dark:hover:bg-gray-600': !context.disabled,
+                'hover:bg-gray-100 dark:hover:bg-gray-700': !context.disabled,
                 'focus:outline-none focus:outline-offset-0': !context.disabled
             },
 
@@ -77,7 +77,7 @@ export default {
 
             // State
             {
-                'hover:bg-gray-100 dark:hover:bg-gray-600': !context.disabled,
+                'hover:bg-gray-100 dark:hover:bg-gray-700': !context.disabled,
                 'focus:outline-none focus:outline-offset-0': !context.disabled
             },
 
@@ -107,7 +107,7 @@ export default {
 
             // State
             {
-                'hover:bg-gray-100 dark:hover:bg-gray-600': !context.disabled,
+                'hover:bg-gray-100 dark:hover:bg-gray-700': !context.disabled,
                 'focus:outline-none focus:outline-offset-0': !context.disabled
             },
 
@@ -137,7 +137,7 @@ export default {
 
             // State
             {
-                'hover:bg-gray-100 dark:hover:bg-gray-600': !context.disabled,
+                'hover:bg-gray-100 dark:hover:bg-gray-700': !context.disabled,
                 'focus:outline-none focus:outline-offset-0': !context.disabled
             },
 
@@ -176,7 +176,7 @@ export default {
 
             // State
             {
-                'hover:bg-gray-100 dark:hover:bg-gray-600': !context.disabled,
+                'hover:bg-gray-100 dark:hover:bg-gray-700': !context.disabled,
                 'focus:outline-none focus:outline-offset-0': !context.disabled,
                 'bg-primary-100 dark:bg-primary-700 hover:bg-primary-100 dark:hover:bg-primary-600 text-primary-600 dark:text-primary-100': context.active
             },

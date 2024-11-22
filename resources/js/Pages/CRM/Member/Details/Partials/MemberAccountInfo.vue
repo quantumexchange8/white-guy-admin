@@ -1,7 +1,7 @@
 <script setup>
 import Button from "@/Components/Button.vue";
 import StatusBadge from "@/Components/StatusBadge.vue";
-import { IconPencilMinus, IconCircleCheck, IconCircleX } from "@tabler/icons-vue";
+import { IconPencilMinus, IconPhone, IconMap } from "@tabler/icons-vue";
 import DefaultProfilePhoto from "@/Components/DefaultProfilePhoto.vue";
 import InputSwitch from "primevue/inputswitch";
 import { ref, watch, h } from "vue";
@@ -11,7 +11,7 @@ import Select from "primevue/select";
 import InputError from "@/Components/InputError.vue";
 import InputText from "primevue/inputtext";
 import { useForm } from "@inertiajs/vue3";
-import { generalFormat, transactionFormat, formatToUserTimezone } from "@/Composables/index.js";
+import { generalFormat, transactionFormat } from "@/Composables/index.js";
 import { useConfirm } from "primevue/useconfirm";
 import { trans } from "laravel-vue-i18n";
 import { router } from "@inertiajs/vue3";
@@ -22,10 +22,11 @@ import TabPanels from 'primevue/tabpanels';
 import TabPanel from 'primevue/tabpanel';
 import { wTrans } from "laravel-vue-i18n";
 import { usePage } from "@inertiajs/vue3";
-import Accordion from 'primevue/accordion';
-import AccordionPanel from 'primevue/accordionpanel';
-import AccordionHeader from 'primevue/accordionheader';
-import AccordionContent from 'primevue/accordioncontent';
+import LeadDetailTab from "@/Pages/CRM/Leads/LeadDetails/Partials/Tabs/LeadDetailTab.vue";
+import DataAndAppointmentTab from "@/Pages/CRM/Leads/LeadDetails/Partials/Tabs/DataAndAppointmentTab.vue";
+import CommunicationAndAssignmentTab from "@/Pages/CRM/Leads/LeadDetails/Partials/Tabs/CommunicationAndAssignmentTab.vue";
+import ContactInfoTab from "@/Pages/CRM/Leads/LeadDetails/Partials/Tabs/ContactInfoTab.vue";
+import RemarksAndSystemTab from "@/Pages/CRM/Leads/LeadDetails/Partials/Tabs/RemarksAndSystemTab.vue";
 import dayjs from "dayjs";
 import utc from 'dayjs/plugin/utc'
 import timezone from 'dayjs/plugin/timezone'
@@ -36,28 +37,15 @@ dayjs.extend(timezone);
 const user = usePage().props.auth.user;
 
 const props = defineProps({
-    lead_id: Number,
+    memberDetail: Object,
     isLoading: Boolean,
 })
 
-const leadNotes = ref();
 const visible = ref(false)
 // const countries = ref(props.countries)
 const selectedCountry = ref();
 const { formatRgbaColor } = generalFormat();
 const { formatAmount } = transactionFormat();
-
-const getLeadNotes = async () => {
-    try {
-        const response = await axios.get(`/crm/lead/getLeadNotes?id=` + props.lead_id);
-
-        leadNotes.value = response.data;
-    } catch (error) {
-        console.error('Error get network:', error);
-    }
-};
-
-getLeadNotes();
 
 const openDialog = () => {
     visible.value = true
@@ -72,11 +60,11 @@ const form = useForm({
     phone_number: '',
 });
 
-// watch(() => props.leadNotes, (user) => {
-//     form.user_id = props.leadNotes.id
-//     form.name = props.leadNotes.name
-//     form.email = props.leadNotes.email
-//     form.phone = props.leadNotes.phone
+// watch(() => props.memberDetail, (user) => {
+//     form.user_id = props.memberDetail.id
+//     form.name = props.memberDetail.name
+//     form.email = props.memberDetail.email
+//     form.phone = props.memberDetail.phone
 
 //     // Set selectedCountry based on dial_code
 //     // selectedCountry.value = countries.value.find(country => country.phone_code === user.dial_code);
@@ -103,78 +91,84 @@ const submitForm = () => {
     <div class="w-full flex flex-col items-center p-3 gap-3 self-stretch rounded-lg bg-white dark:bg-gray-800 shadow-card md:px-6 md:py-5">
         <div class="flex flex-col justify-center items-center gap-4 self-stretch">
             <div class="flex justify-between items-start self-stretch">
-                <span class="w-full text-gray-950 dark:text-white font-bold text-xxl break-words">{{ $t('public.lead_notes') }}</span>
-                <!-- <Button
+                <span class="w-full text-gray-950 dark:text-gray-100 font-bold text-xxl break-words">{{ $t('public.account_info') }}</span>
+                <Button
                     type="button"
                     iconOnly
                     size="base"
                     variant="gray-text"
                     pill
                     @click="openDialog()"
-                    :disabled="!leadNotes"
+                    :disabled="!memberDetail && isLoading"
                 >
                     <IconPencilMinus size="20" />
-                </Button> -->
+                </Button>
             </div>
         </div>
         <div class="h-[1px] self-stretch bg-gray-200" />
-        <!-- Accordion to display lead notes -->
-        <Accordion multiple class="w-full max-h-[900px] 2xl:max-h-[800px] overflow-auto">
-            <div v-if="isLoading" class="animate-pulse flex flex-col items-start gap-1.5 self-stretch">
-                <div class="h-20 bg-gray-200 rounded-xl w-full my-2 md:my-3"></div>
-            </div>
-            <AccordionPanel
-                v-else
-                v-for="(note, index) in leadNotes" 
-                :key="note.id" 
-                :value="index"
-            >
-                <div class="w-full flex gap-2">
-                    <!-- dot on the top-left -->
-                    <div class="flex flex-col items-center">
-                        <div 
-                            class="w-3 h-3 rounded-full grow-0 shrink-0"
-                            :class="`bg-${note.color}-500`"
-                        >
-                        </div>
-                        <div class="w-0.5 h-full bg-gray-200 dark:bg-gray-500 "></div>
-                    </div>
-                    
-                    <div
-                        class="w-full flex flex-col border-b-gray-200 dark:border-b-gray-500"
-                        :class="{
-                            'py-2 border-b': index !== 0 && index !== leadNotes.length - 1,
-                            'pb-2 border-b': index === 0,
-                            'pt-2': index === leadNotes.length - 1
-                        }"
-                    >
-                        <div class="flex flex-col items-center pt-2 gap-1">
-                            <h3 class="self-stretch text-gray-950 dark:text-gray-100 font-semibold">{{ note.note }}</h3>
-                            <!-- <span class="self-stretch text-sm text-gray-500 dark:text-gray-400">{{ formatToUserTimezone(note.created_at, user.timezone, true) }}</span> -->
-                            <span class="self-stretch text-sm text-gray-500 dark:text-gray-400">{{ note.created_at }}</span>
-                        </div>
-                        <AccordionHeader class="px-2 text-start">{{ `${$t('public.lead_note_details')}&nbsp;(${note.id})` }}</AccordionHeader>
-                        <AccordionContent>
-                            <div class="w-full flex flex-col items-center p-2">
-                                <div class="w-full flex items-center gap-2">
-                                    <span class="truncate text-gray-950 dark:text-gray-100 font-semibold">{{ $t('public.user_editable') }}:</span>
-                                    <component 
-                                        :is="note.user_editable ? h(IconCircleCheck) : h(IconCircleX)" 
-                                        size="24" 
-                                        stroke-width="1.25" 
-                                        :class="note.user_editable ? 'text-success-700' : 'text-error-500'" 
-                                    />
-                                </div>
-                                <div class="w-full flex items-center gap-2">
-                                    <span class="truncate text-gray-950 dark:text-gray-100 font-semibold">{{ $t('public.created_by') }}:</span>
-                                    <span class="truncate text-primary-700 font-bold">{{ note.lead_note_creator.username || '' }} ({{ note.lead_note_creator.site.name || '' }})</span>
-                                </div>
-                            </div>
-                        </AccordionContent>
-                    </div>
+        <div v-if="isLoading" class="w-full grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-5 animate-pulse">
+            <div class="flex flex-col gap-2">
+                <div class="text-gray-500 truncate">{{ $t('public.date_joined') }}</div>
+                <div class="truncate text-gray-700 font-medium">
+                    <div class="h-2 bg-gray-200 rounded-full w-48 my-2"></div>
                 </div>
-            </AccordionPanel>
-        </Accordion>
+            </div>
+            <div class="flex flex-col gap-2">
+                <div class="text-gray-500 truncate">{{ $t('public.full_name') }}</div>
+                <div class="h-2 bg-gray-200 rounded-full w-36 my-2"></div>
+            </div>
+            <div class="flex flex-col gap-2">
+                <div class="text-gray-500 truncate">{{ $t('public.id') }}</div>
+                <div class="h-3 bg-gray-200 rounded-full w-20 mt-1 mb-1.5"></div>
+            </div>
+            <div class="flex flex-col gap-2">
+                <div class="text-gray-500 truncate">{{ $t('public.country') }}</div>
+                <div class="h-3 bg-gray-200 rounded-full w-36 mt-1 mb-1.5"></div>
+            </div>
+            <div class="flex flex-col gap-2">
+                <div class="text-gray-500 truncate">{{ $t('public.site') }}</div>
+                <div class="h-2 bg-gray-200 rounded-full w-36 mt-2 mb-1"></div>
+            </div>
+        </div>
+
+        <div v-else class="w-full grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-5">
+            <div class="flex flex-col gap-2">
+                <div class="text-gray-500 dark:text-gray-300 truncate">{{ $t('public.account_holder_name') }}</div>
+                <div class="truncate text-gray-700 dark:text-gray-100 font-medium">{{ memberDetail?.account_holder || '-' }}</div>
+            </div>
+            <div class="flex flex-col gap-2">
+                <div class="text-gray-500 dark:text-gray-300 truncate">{{ $t('public.account_type') }}</div>
+                <div class="truncate text-gray-700 dark:text-gray-100 font-medium">{{ memberDetail?.account_type || '-' }}</div>
+            </div>
+            <div class="flex flex-col gap-2">
+                <div class="text-gray-500 dark:text-gray-300 truncate">{{ $t('public.account_manager') }}</div>
+                <div class="truncate text-gray-700 dark:text-gray-100 font-medium">{{ memberDetail?.account_manager?.username || '-' }}</div>
+            </div>
+            <div class="flex flex-col gap-2">
+                <div class="text-gray-500 dark:text-gray-300 truncate">{{ $t('public.rank') }}</div>
+                <div class="truncate text-gray-700 dark:text-gray-100 font-medium">{{ memberDetail?.rank || '-' }}</div>
+            </div>
+            <div class="flex flex-col gap-2">
+                <div class="text-gray-500 dark:text-gray-300 truncate">{{ $t('public.customer_type') }}</div>
+                <div class="truncate text-gray-700 dark:text-gray-100 font-medium">{{ memberDetail?.customer_type || '-' }}</div>
+            </div>
+            <div class="flex flex-col gap-2">
+                <div class="text-gray-500 dark:text-gray-300 truncate">{{ $t('public.lead_status') }}</div>
+                <div class="truncate text-gray-700 dark:text-gray-100 font-medium">{{ memberDetail?.lead_status || '-' }}</div>
+            </div>
+            <div class="flex flex-col gap-2">
+                <div class="text-gray-500 dark:text-gray-300 truncate">{{ $t('public.client_stage') }}</div>
+                <div class="truncate text-gray-700 dark:text-gray-100 font-medium">{{ memberDetail?.client_stage || '-' }}</div>
+            </div>
+            <div class="flex flex-col gap-2">
+                <div class="text-gray-500 dark:text-gray-300 truncate">{{ $t('public.previous_broker_name') }}</div>
+                <div class="truncate text-gray-700 dark:text-gray-100 font-medium">{{ memberDetail?.previous_broker_name || '-' }}</div>
+            </div>
+            <div class="flex flex-col gap-2">
+                <div class="text-gray-500 dark:text-gray-300 truncate">{{ $t('public.wallet_balance') }}</div>
+                <div class="truncate text-gray-700 dark:text-gray-100 font-medium">{{ memberDetail?.wallet_balance || '-' }}</div>
+            </div>
+        </div>
     </div>
 
     <!-- edit contact info -->

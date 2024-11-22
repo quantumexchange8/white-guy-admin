@@ -19,7 +19,7 @@ const user = usePage().props.auth.user;
 
 <!-- CommunicationAndAssignmentTab.vue -->
 <template>
-        <div v-if="props.leadDetail" class="w-full grid md:grid-cols-2 2xl:grid-cols-3 gap-5">
+        <div v-if="props.leadDetail" class="w-full grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-5">
             <div class="flex flex-col gap-2">
                 <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.last_called') }}</div>
                 <!-- <div class="truncate text-gray-700 dark:text-gray-300 font-medium">{{ props.leadDetail?.contacted_at ? formatToUserTimezone(props.leadDetail.contacted_at, user.timezone, true) : '-' }}</div> -->

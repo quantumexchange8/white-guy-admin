@@ -56,7 +56,7 @@ export default {
         class: [
             'flex items-center',
             '[&>[data-pc-name=pcclosebutton]]:text-gray-700 dark:[&>[data-pc-name=pcclosebutton]]:text-gray-100',
-            '[&>[data-pc-name=pcclosebutton]]:hover:bg-gray-100 dark:[&>[data-pc-name=pcclosebutton]]:hover:bg-gray-600',
+            '[&>[data-pc-name=pcclosebutton]]:hover:bg-gray-100 dark:[&>[data-pc-name=pcclosebutton]]:hover:bg-gray-700',
             '[&>[data-pc-name=pcclosebutton]]:border-0',
             '[&>[data-pc-name=pcclosebutton]]:ring-0',
             '[&>[data-pc-name=pcclosebutton]]:outline-none',
