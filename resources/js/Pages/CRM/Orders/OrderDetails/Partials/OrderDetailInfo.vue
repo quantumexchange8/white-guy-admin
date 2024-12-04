@@ -15,15 +15,8 @@ import { generalFormat, transactionFormat } from "@/Composables/index.js";
 import { useConfirm } from "primevue/useconfirm";
 import { trans } from "laravel-vue-i18n";
 import { router } from "@inertiajs/vue3";
-import Tabs from 'primevue/tabs';
-import TabList from 'primevue/tablist';
-import Tab from 'primevue/tab';
-import TabPanels from 'primevue/tabpanels';
-import TabPanel from 'primevue/tabpanel';
 import { wTrans } from "laravel-vue-i18n";
 import { usePage } from "@inertiajs/vue3";
-import BasicInfoTab from "@/Pages/CRM/Leads/LeadDetails/Partials/Tabs/BasicInfoTab.vue";
-import FinancialDetailTab from "@/Pages/CRM/Leads/LeadDetails/Partials/Tabs/FinancialDetailTab.vue";
 import dayjs from "dayjs";
 import utc from 'dayjs/plugin/utc'
 import timezone from 'dayjs/plugin/timezone'
@@ -34,7 +27,7 @@ dayjs.extend(timezone);
 const user = usePage().props.auth.user;
 
 const props = defineProps({
-    leadFront: Object,
+    orderDetail: Object,
     isLoading: Boolean,
 })
 
@@ -57,11 +50,11 @@ const form = useForm({
     phone_number: '',
 });
 
-// watch(() => props.leadFront, (user) => {
-//     form.user_id = props.leadFront.id
-//     form.name = props.leadFront.name
-//     form.email = props.leadFront.email
-//     form.phone = props.leadFront.phone
+// watch(() => props.orderDetail, (user) => {
+//     form.user_id = props.orderDetail.id
+//     form.name = props.orderDetail.name
+//     form.email = props.orderDetail.email
+//     form.phone = props.orderDetail.phone
 
 //     // Set selectedCountry based on dial_code
 //     // selectedCountry.value = countries.value.find(country => country.phone_code === user.dial_code);
@@ -82,43 +75,13 @@ const submitForm = () => {
     });
 };
 
-const tabs = ref([
-    {   
-        title: wTrans('public.lead_details'),
-        type: 'lead_details',
-        component: h(BasicInfoTab),
-    },
-    {   
-        title: wTrans('public.data_and_appointment'),
-        type: 'data_and_appointment',
-        component: h(FinancialDetailTab),
-    },
-]);
-
-const selectedType = ref('lead_details');
-const activeIndex = ref(tabs.value.findIndex(tab => tab.type === selectedType.value));
-
-// Watch for changes in selectedType and update the activeIndex accordingly
-watch(selectedType, (newType) => {
-    const index = tabs.value.findIndex(tab => tab.type === newType);
-    if (index >= 0) {
-        activeIndex.value = index;
-        getResults();
-    }
-});
-
-function updateType(event) {
-    const selectedTab = tabs.value[event.index];
-    selectedType.value = selectedTab.type;
-}
-
 </script>
 
 <template>
     <div class="w-full flex flex-col items-center p-3 gap-3 self-stretch rounded-lg bg-white dark:bg-gray-800 shadow-card md:px-6 md:py-5">
         <div class="flex flex-col justify-center items-center gap-2 self-stretch">
             <div class="flex justify-between items-start self-stretch">
-                <span class="w-full text-gray-950 dark:text-gray-100 font-bold text-xxl break-words">{{ $t('public.lead_front_details') }}</span>
+                <span class="w-full text-gray-950 dark:text-gray-100 font-bold text-xxl break-words">{{ $t('public.order_details') }}</span>
                 <Button
                     type="button"
                     iconOnly
@@ -126,7 +89,7 @@ function updateType(event) {
                     variant="gray-text"
                     pill
                     @click="openDialog()"
-                    :disabled="!leadFront && isLoading"
+                    :disabled="!orderDetail"
                 >
                     <IconPencilMinus size="20" />
                 </Button>
@@ -137,39 +100,117 @@ function updateType(event) {
             <div v-else class="flex flex-col items-start gap-1 self-stretch">
                 <div class="grid items-start gap-1 self-stretch">
                     <span class="w-full truncate self-stretch text-gray-950 dark:text-gray-100 text-xl font-bold">
-                        {{ leadFront?.name ? leadFront.name : '-' }}
+                        {{ orderDetail?.user?.full_name ? orderDetail?.user?.full_name : '-' }}
                     </span>
                     <span class="w-full truncate self-stretch text-gray-500 dark:text-gray-100 text-sm font-bold">
-                        {{ leadFront?.email ? leadFront.email : '-' }}
+                        {{ orderDetail?.user?.email ? orderDetail?.user?.email : '-' }}
                     </span>
                     <div class="w-full truncate flex items-start gap-1 self-stretch">
                         <IconPhone size="20" stroke-width="1.25" class="text-gray-500" />
                         <span class="w-full truncate self-stretch text-gray-500 dark:text-gray-100 text-sm font-bold">
-                            {{ leadFront?.phone_number ? leadFront.phone_number : '-' }}
+                            {{ orderDetail?.user?.phone_number ? orderDetail?.user?.phone_number : '' }}
                         </span>
                     </div>
                 </div>
-                <Tabs v-model:value="activeIndex" class="w-full" @tab-change="updateType" >
-                    <TabList>
-                        <Tab 
-                            v-for="(tab, index) in tabs" 
-                            :key="tab.title"
-                            :value="index"
-                        >
-                            {{ tab.title }}
-                        </Tab>
-                    </TabList>
-                </Tabs>
             </div>
         </div>
         <div class="h-[1px] self-stretch bg-gray-200" />
-        <component 
-            v-if="tabs[activeIndex].component"
-            :is="tabs[activeIndex].component" 
-            key="tabs[activeIndex].type" 
-            :leadFront="props.leadFront"
-            :isLoading="isLoading"
-        />
+        <div v-if="isLoading" class="w-full grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-5 animate-pulse">
+            <div class="flex flex-col gap-2">
+                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.created_at') }}</div>
+                <div class="truncate text-gray-700 dark:text-gray-300 font-medium">
+                    <div class="h-2 bg-gray-200 rounded-full w-48 my-2"></div>
+                </div>
+            </div>
+            <div class="flex flex-col gap-2">
+                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.created_at') }}</div>
+                <div class="h-2 bg-gray-200 rounded-full w-36 my-2"></div>
+            </div>
+            <div class="flex flex-col gap-2">
+                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.trade_id') }}</div>
+                <div class="h-3 bg-gray-200 rounded-full w-20 mt-1 mb-1.5"></div>
+            </div>
+            <div class="flex flex-col gap-2">
+                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.action_type') }}</div>
+                <div class="h-3 bg-gray-200 rounded-full w-36 mt-1 mb-1.5"></div>
+            </div>
+            <div class="flex flex-col gap-2">
+                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.stock_type') }}</div>
+                <div class="h-2 bg-gray-200 rounded-full w-36 mt-2 mb-1"></div>
+            </div>
+            <div class="flex flex-col gap-2">
+                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.stock') }}</div>
+                <div class="h-2 bg-gray-200 rounded-full w-36 mt-2 mb-1"></div>
+            </div>
+            <div class="flex flex-col gap-2">
+                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.limb_stage') }}</div>
+                <div class="h-2 bg-gray-200 rounded-full w-36 my-2"></div>
+            </div>
+            <div class="flex flex-col gap-2">
+                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.quantity') }}</div>
+                <div class="h-3 bg-gray-200 rounded-full w-20 mt-1 mb-1.5"></div>
+            </div>
+            <div class="flex flex-col gap-2">
+                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.unit_price') }}</div>
+                <div class="h-3 bg-gray-200 rounded-full w-36 mt-1 mb-1.5"></div>
+            </div>
+            <div class="flex flex-col gap-2">
+                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.current_unit_price') }}</div>
+                <div class="h-2 bg-gray-200 rounded-full w-36 mt-2 mb-1"></div>
+            </div>
+            <div class="flex flex-col gap-2">
+                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.amount') }}</div>
+                <div class="h-2 bg-gray-200 rounded-full w-36 mt-2 mb-1"></div>
+            </div>
+        </div>
+
+        <div v-else class="w-full grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-5">
+            <div class="flex flex-col gap-2">
+                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.created_at') }}</div>
+                <!-- <div class="truncate text-gray-700 dark:text-gray-300 font-medium">{{ props.orderDetail?.created_at ? formatToUserTimezone(props.orderDetail.created_at, user.timezone, true) : '-' }}</div> -->
+                <div class="truncate text-gray-700 dark:text-gray-300 font-medium">{{ props.orderDetail?.created_at ? props.orderDetail.created_at : '-' }}</div>
+            </div>
+            <div class="flex flex-col gap-2">
+                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.trade_id') }}</div>
+                <div class="truncate text-gray-700 dark:text-gray-300 font-medium">{{ props.orderDetail?.trade_id || '-' }}</div>
+            </div>
+            <div class="flex flex-col gap-2">
+                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.action_type') }}</div>
+                <div class="truncate text-gray-700 dark:text-gray-300 font-medium">{{ props.orderDetail?.action_type || '-' }}</div>
+            </div>
+            <div class="flex flex-col gap-2">
+                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.stock_type') }}</div>
+                <div class="truncate text-gray-700 dark:text-gray-300 font-medium">{{ props.orderDetail?.stock_type || '-' }}</div>
+            </div>
+            <div class="flex flex-col gap-2">
+                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.stock') }}</div>
+                <div class="truncate text-gray-700 dark:text-gray-300 font-medium">{{ props.orderDetail?.stock || '-' }}</div>
+            </div>
+            <div class="flex flex-col gap-2">
+                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.limb_stage') }}</div>
+                <div class="truncate text-gray-700 dark:text-gray-300 font-medium">{{ props.orderDetail?.limb_stage || '-' }}</div>
+            </div>
+            <div class="flex flex-col gap-2">
+                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.quantity') }}</div>
+                <div class="truncate text-gray-700 dark:text-gray-300 font-medium">{{ props.orderDetail?.quantity || '-' }}</div>
+            </div>
+            <div class="flex flex-col gap-2">
+                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.unit_price') }}</div>
+                <div class="truncate text-gray-700 dark:text-gray-300 font-medium">{{ props.orderDetail?.unit_price || '-' }}</div>
+            </div>
+            <div class="flex flex-col gap-2">
+                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.current_unit_price') }}</div>
+                <div class="truncate text-gray-700 dark:text-gray-300 font-medium">{{ props.orderDetail?.current_unit_price || '-' }}</div>
+            </div>
+            <div class="flex flex-col gap-2">
+                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.amount') }}</div>
+                <div class="truncate text-gray-700 dark:text-gray-300 font-medium">
+                    {{ props.orderDetail?.action_type === 'SELL' ? formatAmount(props.orderDetail.profit) : (props.orderDetail?.action_type === 'BUY' ? formatAmount(props.orderDetail.unit_price * props.orderDetail.quantity) : '-') }}
+                </div>
+            </div>
+        </div>
+
+
     </div>
 
     <!-- edit contact info -->

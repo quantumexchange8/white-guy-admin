@@ -101,7 +101,7 @@ const submitForm = () => {
 
 <template>
     <div class="w-full flex flex-col items-center p-3 gap-3 self-stretch rounded-lg bg-white dark:bg-gray-800 shadow-card md:px-6 md:py-5">
-        <div class="flex flex-col justify-center items-center gap-4 self-stretch">
+        <div class="flex flex-col justify-center items-center gap-2 self-stretch">
             <div class="flex justify-between items-start self-stretch">
                 <span class="w-full text-gray-950 dark:text-white font-bold text-xxl break-words">{{ $t('public.lead_notes') }}</span>
                 <!-- <Button

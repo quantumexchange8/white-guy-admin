@@ -21,13 +21,13 @@ dayjs.extend(utc);
 dayjs.extend(timezone);
 
 const props = defineProps({
-    member: Object
+    sale_order: Object
 })
 
 const visible = ref(false);
 const loading = ref(false);
 const dt = ref(null);
-const orders = ref([]);
+const items = ref([]);
 const { formatAmount } = transactionFormat();
 const filters = ref({
     global: null,
@@ -61,7 +61,7 @@ const getResults = async (dateRanges = null) => {
     loading.value = true;
 
     try {
-        let url = `/crm/member/getMemberOrders?id=${props.member.id}`;
+        let url = `/crm/saleOrder/getSaleOrderItems?id=${props.sale_order.id}`;
 
         if (filters.value.global) {
             url += `&search=${filters.value.global}`;
@@ -73,7 +73,7 @@ const getResults = async (dateRanges = null) => {
         }
 
         const response = await axios.get(url);
-        orders.value = response.data;
+        items.value = response.data;
     } catch (error) {
         console.error('Error fetching adjustment history data:', error);
     } finally {
@@ -136,7 +136,7 @@ const openDialog = (rowData) => {
     <!-- data table -->
     <div class="flex flex-col items-center justify-center p-6 gap-6 self-stretch rounded-lg shadow-card overflow-auto bg-white dark:bg-gray-800">
         <DataTable
-            :value="orders"
+            :value="items"
             ref="dt"
             :loading="loading"
             removableSort
@@ -228,50 +228,62 @@ const openDialog = (rowData) => {
                     </div>
                 </template>
             </Column>
-            <Column field="trade_id" style="width: 20%" headerClass="hidden md:table-cell" class="hidden md:table-cell">
+            <Column field="public_id" style="width: 15%" headerClass="hidden md:table-cell" class="hidden md:table-cell">
                 <template #header>
-                    <span class="hidden md:block">{{ $t('public.trade_id') }}</span>
+                    <span class="hidden md:block">{{ $t('public.public_id') }}</span>
                 </template>
                 <template #body="slotProps">
                     <div class="text-gray-950 dark:text-gray-100 text-sm">
-                        {{ slotProps.data.trade_id }}
+                        {{ slotProps.data.public_id }}
                     </div>
                 </template>
             </Column>
-            <Column field="action_type" style="width: 20%" headerClass="hidden md:table-cell" class="hidden md:table-cell">
+            <Column field="order_type" style="width: 15%" headerClass="hidden md:table-cell" class="hidden md:table-cell">
                 <template #header>
-                    <span class="hidden md:block">{{ $t('public.type') }}</span>
+                    <span class="hidden md:block">{{ $t('public.order_type') }}</span>
                 </template>
                 <template #body="slotProps">
-                    {{ $t(`${slotProps.data.action_type}`) }}
+                    <div class="text-gray-950 dark:text-gray-100 text-sm">
+                        {{ slotProps.data.order_type }}
+                    </div>
                 </template>
             </Column>
-            <Column field="profit" sortable style="width: 20%" headerClass="hidden md:table-cell" class="hidden md:table-cell">
+            <Column field="product" style="width: 15%" headerClass="hidden md:table-cell" class="hidden md:table-cell">
+                <template #header>
+                    <span class="hidden md:block">{{ $t('public.product') }}</span>
+                </template>
+                <template #body="slotProps">
+                    <div class="text-gray-950 dark:text-gray-100 text-sm">
+                        {{ slotProps.data.product }}
+                    </div>
+                </template>
+            </Column>
+            <Column field="total_price" sortable style="width: 15%" headerClass="hidden md:table-cell" class="hidden md:table-cell">
                 <template #header>
                     <span class="hidden md:block">{{ `${$t('public.amount')} ($)` }}</span>
                 </template>
                 <template #body="slotProps">
-                    {{ formatAmount(slotProps.data.profit) }}
+                    {{ formatAmount(slotProps.data.total_price) }}
                 </template>
             </Column>
-            <Column field="limb_stage" style="width: 20%" headerClass="hidden md:table-cell" class="hidden md:table-cell">
+            <Column field="completed_at" style="width: 20%" headerClass="hidden md:table-cell" class="hidden md:table-cell">
                 <template #header>
-                    <span class="hidden md:block">{{ $t('public.stage') }}</span>
+                    <span class="hidden md:block">{{ $t('public.completed_at') }}</span>
                 </template>
                 <template #body="slotProps">
-                    {{ slotProps.data?.limb_stage || '-' }}
+                    {{ $t(`${slotProps.data?.completed_at || '-' }`) }}
                 </template>
             </Column>
-            <Column field="created_at" style="width: 20%" headerClass="hidden" class="md:hidden">
+            <Column field="created_at" headerClass="hidden" class="md:hidden">
                 <template #body="slotProps">
                     <div class="w-full grid grid-cols-2">
                         <div class="flex flex-col items-start justify-center gap-1">
-                            <span class="w-full truncate text-gray-950 dark:text-gray-100 text-sm font-bold">{{ slotProps.data.created_at }}</span>
-                            <span class="w-full truncate text-gray-500 dark:text-gray-300 text-sm font-medium">{{ $t('public.action_type') }}:&nbsp;{{ slotProps.data.action_type }}</span>
+                            <span class="w-full truncate text-gray-950 dark:text-gray-100 text-sm font-bold">{{ dayjs(slotProps.data.created_at).format('YYYY/MM/DD') }}</span>
+                            <span class="w-full truncate text-gray-500 dark:text-gray-300 text-sm font-medium">{{ $t('public.order_type') }}:&nbsp;{{ slotProps.data.order_type }}</span>
                         </div>
                         <div class="flex flex-col items-start justify-center gap-1">
-                            <span class="w-full truncate text-right text-gray-950 dark:text-gray-100 text-sm font-bold">$&nbsp;{{ slotProps.data.profit }}</span>
-                            <span class="w-full truncate text-right text-gray-500 dark:text-gray-300 text-sm font-medium">{{ $t('public.stage') }}:&nbsp;{{ slotProps.data.limb_stage }}</span>
+                            <span class="w-full truncate text-right text-gray-950 dark:text-gray-100 text-sm font-bold">$&nbsp;{{ slotProps.data.total_price }}</span>
+                            <span class="w-full truncate text-right text-gray-500 dark:text-gray-300 text-sm font-medium">{{ $t('public.completed_at') }}:&nbsp;{{ slotProps.data?.completed_at || '-' }}</span>
                         </div>
                     </div>
                 </template>
@@ -279,19 +291,19 @@ const openDialog = (rowData) => {
         </DataTable>
     </div>
 
-    <Dialog v-model:visible="visible" modal :header="$t('public.order_details')" class="dialog-xs md:dialog-md">
+    <Dialog v-model:visible="visible" modal :header="$t('public.item_details')" class="dialog-xs md:dialog-md">
         <div class="flex flex-col justify-center items-center gap-3 self-stretch pt-4 md:pt-6">
             <div class="flex flex-col justify-between items-center p-3 gap-3 self-stretch bg-gray-50 dark:bg-gray-700 md:flex-row">
                 <div class="flex flex-col items-start w-full truncate">
                     <span class="w-full truncate text-gray-950 dark:text-gray-100 text-xxl font-semibold">
-                        $&nbsp;{{ data.action_type === 'BUY' ? formatAmount(data.unit_price * data.quantity) : (data.action_type === 'SELL' ? formatAmount(data.profit) : '-') }}
+                        $&nbsp;{{ data?.total_price? formatAmount(data.total_price) : formatAmount(0) }}
                     </span>
                     <div class="w-full flex flex-col items-start gap-1 md:flex-row">
                         <span class="truncate text-gray-500 dark:text-gray-300 text-sm">
-                            {{ $t('public.trade_id') }}
+                            {{ $t('public.public_id') }}
                             <span class="hidden md:inline">:</span>
                         </span>
-                        <span class="truncate text-gray-950 dark:text-gray-100 text-sm font-medium">{{ data.trade_id ?? '-' }}</span>
+                        <span class="truncate text-gray-950 dark:text-gray-100 text-sm font-medium">{{ data.public_id ?? '-' }}</span>
                     </div>
                 </div>
             </div>
@@ -302,47 +314,47 @@ const openDialog = (rowData) => {
                     <span class="w-full truncate text-gray-950 dark:text-gray-100 text-sm font-medium">{{ data.created_at ?? '-' }}</span>
                 </div>
                 <div class="w-full flex flex-col items-start gap-1 md:flex-row">
-                    <span class="w-full max-w-[200px] truncate text-gray-500 dark:text-gray-300 text-sm">{{ $t('public.action_type') }}</span>
-                    <span class="w-full truncate text-gray-950 dark:text-gray-100 text-sm font-medium">{{ data.action_type ?? '-' }}</span>
+                    <span class="w-full max-w-[200px] truncate text-gray-500 dark:text-gray-300 text-sm">{{ $t('public.order_type') }}</span>
+                    <span class="w-full truncate text-gray-950 dark:text-gray-100 text-sm font-medium">{{ data.order_type ?? '-' }}</span>
                 </div>
                 <div class="w-full flex flex-col items-start gap-1 md:flex-row">
-                    <span class="w-full max-w-[200px] truncate text-gray-500 dark:text-gray-300 text-sm">{{ $t('public.stock_type') }}</span>
-                    <span class="w-full truncate text-gray-950 dark:text-gray-100 text-sm font-medium">{{ data.stock_type ? data.stock_type : '-' }}</span>
-                </div>
-                <div class="w-full flex flex-col items-start gap-1 md:flex-row">
-                    <span class="w-full max-w-[200px] truncate text-gray-500 dark:text-gray-300 text-sm">{{ $t('public.stock') }}</span>
-                    <span class="w-full truncate text-gray-950 dark:text-gray-100 text-sm font-medium">{{ data.stock ? data.stock : '-' }}</span>
-                </div>
-                <div class="w-full flex flex-col items-start gap-1 md:flex-row">
-                    <span class="w-full max-w-[200px] truncate text-gray-500 dark:text-gray-300 text-sm">{{ $t('public.stage') }}</span>
-                    <span class="w-full truncate text-gray-950 dark:text-gray-100 text-sm font-medium">{{ data.limb_stage ? data.limb_stage : '-' }}</span>
+                    <span class="w-full max-w-[200px] truncate text-gray-500 dark:text-gray-300 text-sm">{{ $t('public.product') }}</span>
+                    <span class="w-full truncate text-gray-950 dark:text-gray-100 text-sm font-medium">{{ data.product ? data.product : '-' }}</span>
                 </div>
             </div>
 
             <div class="flex flex-col items-center p-3 gap-3 self-stretch bg-gray-50 dark:bg-gray-700">
                 <div class="w-full flex flex-col items-start gap-1 md:flex-row">
-                    <span class="w-full max-w-[200px] truncate text-gray-500 dark:text-gray-300 text-sm">{{ $t('public.unit_price') }}</span>
-                    <span class="w-full truncate text-gray-950 dark:text-gray-100 text-sm font-medium">{{ data.unit_price ? formatAmount(data.unit_price) : '-' }}</span>
+                    <span class="w-full max-w-[200px] truncate text-gray-500 dark:text-gray-300 text-sm">{{ $t('public.price') }}</span>
+                    <span class="w-full truncate text-gray-950 dark:text-gray-100 text-sm font-medium">{{ data.price ? formatAmount(data.price) : '-' }}</span>
+                </div>
+                <div class="w-full flex flex-col items-start gap-1 md:flex-row">
+                    <span class="w-full max-w-[200px] truncate text-gray-500 dark:text-gray-300 text-sm">{{ $t('public.exchanged_price') }}</span>
+                    <span class="w-full truncate text-gray-950 dark:text-gray-100 text-sm font-medium">{{ data.exchanged_price ? formatAmount(data.exchanged_price) : '-' }}</span>
                 </div>
                 <div class="w-full flex flex-col items-start gap-1 md:flex-row">
                     <span class="w-full max-w-[200px] truncate text-gray-500 dark:text-gray-300 text-sm">{{ $t('public.quantity') }}</span>
                     <span class="w-full truncate text-gray-950 dark:text-gray-100 text-sm font-medium">{{ data.quantity ? formatAmount(data.quantity) : '-' }}</span>
                 </div>
                 <div class="w-full flex flex-col items-start gap-1 md:flex-row">
-                    <span class="w-full max-w-[200px] truncate text-gray-500 dark:text-gray-300 text-sm">{{ $t('public.current_unit_price') }}</span>
-                    <span class="w-full truncate text-gray-950 dark:text-gray-100 text-sm font-medium">{{ data.current_unit_price ? formatAmount(data.current_unit_price) : '-' }}</span>
-                </div>
-                <div v-if="data.action_type === 'SELL'" class="w-full flex flex-col items-start gap-1 md:flex-row">
-                    <span class="w-full max-w-[200px] truncate text-gray-500 dark:text-gray-300 text-sm">{{ $t('public.profit') }}</span>
-                    <span class="w-full truncate text-gray-950 dark:text-gray-100 text-sm font-medium">{{ data.profit ? formatAmount(data.profit) : '-' }}</span>
+                    <span class="w-full max-w-[200px] truncate text-gray-500 dark:text-gray-300 text-sm">{{ $t('public.subtotal') }}</span>
+                    <span class="w-full truncate text-gray-950 dark:text-gray-100 text-sm font-medium">{{ data.subtotal ? formatAmount(data.subtotal) : '-' }}</span>
                 </div>
                 <div class="w-full flex flex-col items-start gap-1 md:flex-row">
-                    <span class="w-full max-w-[200px] truncate text-gray-500 dark:text-gray-300 text-sm">{{ $t('public.confirmation_name') }}</span>
-                    <span class="w-full truncate text-gray-950 dark:text-gray-100 text-sm font-medium">{{ data.confirmation_name !== '' ? data.confirmation_name : '-' }}</span>
+                    <span class="w-full max-w-[200px] truncate text-gray-500 dark:text-gray-300 text-sm">{{ $t('public.commission_rate') }}</span>
+                    <span class="w-full truncate text-gray-950 dark:text-gray-100 text-sm font-medium">{{ data.commission_rate !== '' ? data.commission_rate : '-' }}</span>
                 </div>
                 <div class="w-full flex flex-col items-start gap-1 md:flex-row">
-                    <span class="w-full max-w-[200px] truncate text-gray-500 dark:text-gray-300 text-sm">{{ $t('public.confirmed_at') }}</span>
-                    <span class="w-full truncate text-gray-950 dark:text-gray-100 text-sm font-medium">{{ data.confirmed_at !== '' ? data.confirmed_at : '-' }}</span>
+                    <span class="w-full max-w-[200px] truncate text-gray-500 dark:text-gray-300 text-sm">{{ $t('public.commission') }}</span>
+                    <span class="w-full truncate text-gray-950 dark:text-gray-100 text-sm font-medium">{{ data.commission !== '' ? data.commission : '-' }}</span>
+                </div>
+                <div class="w-full flex flex-col items-start gap-1 md:flex-row">
+                    <span class="w-full max-w-[200px] truncate text-gray-500 dark:text-gray-300 text-sm">{{ $t('public.total_exchanged_price') }}</span>
+                    <span class="w-full truncate text-gray-950 dark:text-gray-100 text-sm font-medium">{{ data.total_exchanged_price !== '' ? data.total_exchanged_price : '-' }}</span>
+                </div>
+                <div class="w-full flex flex-col items-start gap-1 md:flex-row">
+                    <span class="w-full max-w-[200px] truncate text-gray-500 dark:text-gray-300 text-sm">{{ $t('public.total_price') }}</span>
+                    <span class="w-full truncate text-gray-950 dark:text-gray-100 text-sm font-medium">{{ data.total_price !== '' ? data.total_price : '-' }}</span>
                 </div>
             </div>
         </div>

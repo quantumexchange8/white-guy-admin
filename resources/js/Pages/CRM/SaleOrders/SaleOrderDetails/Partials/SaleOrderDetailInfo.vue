@@ -15,18 +15,17 @@ import { generalFormat, transactionFormat } from "@/Composables/index.js";
 import { useConfirm } from "primevue/useconfirm";
 import { trans } from "laravel-vue-i18n";
 import { router } from "@inertiajs/vue3";
-import Tabs from 'primevue/tabs';
-import TabList from 'primevue/tablist';
-import Tab from 'primevue/tab';
-import TabPanels from 'primevue/tabpanels';
-import TabPanel from 'primevue/tabpanel';
 import { wTrans } from "laravel-vue-i18n";
 import { usePage } from "@inertiajs/vue3";
-import BasicInfoTab from "@/Pages/CRM/Leads/LeadDetails/Partials/Tabs/BasicInfoTab.vue";
-import FinancialDetailTab from "@/Pages/CRM/Leads/LeadDetails/Partials/Tabs/FinancialDetailTab.vue";
 import dayjs from "dayjs";
 import utc from 'dayjs/plugin/utc'
 import timezone from 'dayjs/plugin/timezone'
+import Tabs from 'primevue/tabs';
+import TabList from 'primevue/tablist';
+import Tab from 'primevue/tab';
+import SaleOrderInfoTab from '@/Pages/CRM/SaleOrders/SaleOrderDetails/Partials/Tabs/SaleOrderInfoTab.vue';
+import ClientDetailInfoTab from '@/Pages/CRM/SaleOrders/SaleOrderDetails/Partials/Tabs/ClientDetailInfoTab.vue';
+import AllocationAndSupportTab from '@/Pages/CRM/SaleOrders/SaleOrderDetails/Partials/Tabs/AllocationAndSupportTab.vue';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -34,7 +33,7 @@ dayjs.extend(timezone);
 const user = usePage().props.auth.user;
 
 const props = defineProps({
-    leadFront: Object,
+    saleOrderDetail: Object,
     isLoading: Boolean,
 })
 
@@ -57,11 +56,11 @@ const form = useForm({
     phone_number: '',
 });
 
-// watch(() => props.leadFront, (user) => {
-//     form.user_id = props.leadFront.id
-//     form.name = props.leadFront.name
-//     form.email = props.leadFront.email
-//     form.phone = props.leadFront.phone
+// watch(() => props.saleOrderDetail, (user) => {
+//     form.user_id = props.saleOrderDetail.id
+//     form.name = props.saleOrderDetail.name
+//     form.email = props.saleOrderDetail.email
+//     form.phone = props.saleOrderDetail.phone
 
 //     // Set selectedCountry based on dial_code
 //     // selectedCountry.value = countries.value.find(country => country.phone_code === user.dial_code);
@@ -84,18 +83,33 @@ const submitForm = () => {
 
 const tabs = ref([
     {   
-        title: wTrans('public.lead_details'),
-        type: 'lead_details',
-        component: h(BasicInfoTab),
+        title: wTrans('sale_order_details'),
+        type: 'sale_order_details',
+        component: h(SaleOrderInfoTab),
     },
     {   
-        title: wTrans('public.data_and_appointment'),
-        type: 'data_and_appointment',
-        component: h(FinancialDetailTab),
+        title: wTrans('client_details'),
+        type: 'client_details',
+        component: h(ClientDetailInfoTab),
     },
+    {   
+        title: wTrans('allocation_and_support'),
+        type: 'allocation_and_support',
+        component: h(AllocationAndSupportTab),
+    },
+    // {   
+    //     title: wTrans('contact_info'),
+    //     type: 'contact_info',
+    //     component: h(ContactInfoTab),
+    // },
+    // {   
+    //     title: wTrans('remarks_and_system'),
+    //     type: 'remarks_and_system',
+    //     component: h(RemarksAndSystemTab),
+    // },
 ]);
 
-const selectedType = ref('lead_details');
+const selectedType = ref('sale_order_details');
 const activeIndex = ref(tabs.value.findIndex(tab => tab.type === selectedType.value));
 
 // Watch for changes in selectedType and update the activeIndex accordingly
@@ -118,7 +132,7 @@ function updateType(event) {
     <div class="w-full flex flex-col items-center p-3 gap-3 self-stretch rounded-lg bg-white dark:bg-gray-800 shadow-card md:px-6 md:py-5">
         <div class="flex flex-col justify-center items-center gap-2 self-stretch">
             <div class="flex justify-between items-start self-stretch">
-                <span class="w-full text-gray-950 dark:text-gray-100 font-bold text-xxl break-words">{{ $t('public.lead_front_details') }}</span>
+                <span class="w-full text-gray-950 dark:text-gray-100 font-bold text-xxl break-words">{{ $t('public.sale_order_details') }}</span>
                 <Button
                     type="button"
                     iconOnly
@@ -126,7 +140,7 @@ function updateType(event) {
                     variant="gray-text"
                     pill
                     @click="openDialog()"
-                    :disabled="!leadFront && isLoading"
+                    :disabled="!saleOrderDetail"
                 >
                     <IconPencilMinus size="20" />
                 </Button>
@@ -137,15 +151,15 @@ function updateType(event) {
             <div v-else class="flex flex-col items-start gap-1 self-stretch">
                 <div class="grid items-start gap-1 self-stretch">
                     <span class="w-full truncate self-stretch text-gray-950 dark:text-gray-100 text-xl font-bold">
-                        {{ leadFront?.name ? leadFront.name : '-' }}
+                        {{ saleOrderDetail?.registered_name ? saleOrderDetail?.registered_name : '-' }}
                     </span>
                     <span class="w-full truncate self-stretch text-gray-500 dark:text-gray-100 text-sm font-bold">
-                        {{ leadFront?.email ? leadFront.email : '-' }}
+                        {{ saleOrderDetail?.email ? saleOrderDetail?.email : '-' }}
                     </span>
                     <div class="w-full truncate flex items-start gap-1 self-stretch">
                         <IconPhone size="20" stroke-width="1.25" class="text-gray-500" />
                         <span class="w-full truncate self-stretch text-gray-500 dark:text-gray-100 text-sm font-bold">
-                            {{ leadFront?.phone_number ? leadFront.phone_number : '-' }}
+                            {{ saleOrderDetail?.mobile_number ? saleOrderDetail?.mobile_number : '' }}
                         </span>
                     </div>
                 </div>
@@ -167,9 +181,11 @@ function updateType(event) {
             v-if="tabs[activeIndex].component"
             :is="tabs[activeIndex].component" 
             key="tabs[activeIndex].type" 
-            :leadFront="props.leadFront"
+            :saleOrderDetail="props.saleOrderDetail"
             :isLoading="isLoading"
         />
+
+
     </div>
 
     <!-- edit contact info -->

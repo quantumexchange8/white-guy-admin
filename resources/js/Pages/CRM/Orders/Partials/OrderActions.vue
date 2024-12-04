@@ -22,7 +22,7 @@ import { trans, wTrans } from "laravel-vue-i18n";
 import Dialog from "primevue/dialog";
 
 const props = defineProps({
-    lead: Object,
+    order: Object,
 })
 
 const menu = ref();
@@ -33,17 +33,17 @@ const toggle = (event) => {
 
 const items = ref([
     {
-        label: 'lead_details',
+        label: 'order_details',
         icon: h(IconIdBadge2),
         command: () => {
-            window.location.href = `/crm/lead/detail/${props.lead.id}`;
+            window.location.href = `/crm/order/detail/${props.order.id}`;
         },
     },
     {
-        label: 'delete_lead',
+        label: 'delete_order',
         icon: h(IconTrashX),
         command: () => {
-            requireConfirmation('delete_lead')
+            requireConfirmation('delete_order')
         },
     },
 ]);
@@ -52,19 +52,19 @@ const confirm = useConfirm();
 
 const requireConfirmation = (action_type) => {
     const messages = {
-        delete_lead: {
+        delete_order: {
             group: 'headless',
             color: 'error',
             icon: h(IconTrashX),
-            header: trans('public.delete_lead'),
-            message: trans('public.delete_lead_desc'),
+            header: trans('public.delete_order'),
+            message: trans('public.delete_order_desc'),
             cancelButton: trans('public.cancel'),
             acceptButton: trans('public.delete'),
             action: () => {
-                router.visit(route('lead.deleteLead'), {
+                router.visit(route('order.deleteOrder'), {
                     method: 'delete',
                     data: {
-                        id: props.lead.id,
+                        id: props.order.id,
                     },
                 })
             }

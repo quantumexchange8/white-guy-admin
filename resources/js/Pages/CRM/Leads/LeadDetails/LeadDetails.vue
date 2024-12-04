@@ -69,16 +69,16 @@ watchEffect(() => {
                         :leadDetail="leadDetail"
                         :isLoading="isLoading"
                     />
-                    <!-- <LeadFrontInfo
+                    <LeadFrontInfo
                         :leadFront="leadFront"
                         :isLoading="isLoading"
-                    /> -->
+                    />
                 </div>
                 <div class="w-full grid col-span-1">
-                    <!-- <LeadNotes
+                    <LeadNotes
                         :lead_id="props.lead.id"
                         :isLoading="isLoading"
-                    /> -->
+                    />
                 </div>
             </div>
         </div>

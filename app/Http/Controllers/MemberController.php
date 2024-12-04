@@ -20,7 +20,7 @@ class MemberController extends Controller
         return Inertia::render('CRM/Member/Listings/MemberListing');
     }
 
-    public function getMemberListing(Request $request)
+    public function getMembers(Request $request)
     {
         // Start building the query
         $query = User::query()
@@ -31,7 +31,7 @@ class MemberController extends Controller
         if ($search) {
             $query->where(function ($query) use ($search) {
                 $query->where('full_name', 'like', '%' . $search . '%')
-                    ->orWhere('user_name', 'like', '%' . $search . '%')
+                    ->orWhere('username', 'like', '%' . $search . '%')
                     ->orWhere('email', 'like', '%' . $search . '%')
                     ->orWhere('phone_number', 'like', '%' . $search . '%')
                     ->orWhere('country', 'like', '%' . $search . '%');
@@ -160,36 +160,74 @@ class MemberController extends Controller
     
     public function getMemberOrders(Request $request)
     {
-        $orders = User::find($request->id)
-                        ->orders()
-                        ->latest()
-                        ->get();
-
-        $limb_stages = [ "ALLO", "Allo + docs", "TT", "CLEARED", "Cancelled", "Cancelled - bank block", "Cancelled - HTR", 
-                        "Cancelled - order drop", "Cancelled refuse trade", "Kicked", "Carry over", "Free switch" ];
-
-        foreach ($orders as $userOrders) {
-            // Handle limb_stage attribute
-            if (!is_null($userOrders->limb_stage) && $userOrders->limb_stage !== '') {
-                $userOrders->limb_stage = $limb_stages[$userOrders->limb_stage - 1];
+        $user = User::find($request->id);
+    
+        if (!$user) {
+            return response()->json(['error' => 'User not found'], 404);
+        }
+    
+        $query = $user->orders()->latest();
+    
+        // Handle search functionality
+        $search = $request->input('search');
+        if ($search) {
+            $query->where(function ($query) use ($search) {
+                $query->where('trade_id', 'like', '%' . $search . '%');
+            });
+        }
+    
+        // Handle date range filtering
+        $startDate = $request->input('startDate');
+        $endDate = $request->input('endDate');
+        if ($startDate && $endDate) {
+            $query->whereBetween('created_at', [$startDate, $endDate]);
+        } elseif ($startDate) {
+            $query->where('created_at', '>=', $startDate);
+        } elseif ($endDate) {
+            $query->where('created_at', '<=', $endDate);
+        }
+    
+        // Fetch orders after applying filters
+        $orders = $query->get();
+    
+        // Limb stages mapping
+        $limb_stages = [
+            "ALLO", "Allo + docs", "TT", "CLEARED", "Cancelled", 
+            "Cancelled - bank block", "Cancelled - HTR", 
+            "Cancelled - order drop", "Cancelled refuse trade", 
+            "Kicked", "Carry over", "Free switch"
+        ];
+    
+        foreach ($orders as $order) {
+            // Map limb_stage if it is numeric and within the range
+            if (!is_null($order->limb_stage) && is_numeric($order->limb_stage)) {
+                $index = (int) $order->limb_stage - 1; // Assuming 1-based index
+                $order->limb_stage = $limb_stages[$index] ?? $order->limb_stage;
             }
         }
-
+    
         return response()->json($orders);
     }
-
-    public function getLatestUsersClients()
+    
+    public function getMemberLogEntries(Request $request)
     {
-        $data = User::with([
-                            'site', 
-                            'accountManager:id,username,site_id', 
-                            'accountManager.site:id,name'
-                        ])
-                        ->latest()
-                        ->take(5)
-                        ->get();
-        
-        return response()->json($data);
-    }
-
+        $id = $request->input('id');
+    
+        // Use eager loading with a where condition to directly filter the log entries
+        $userLogEntries = ContentType::with(['auditLogEntries' => function ($query) use ($id) {
+            $query->where('object_id', $id);
+        }])
+        ->where('app_label', 'core')
+        ->where('model', 'user')
+        ->orderByDesc('id')
+        ->get();  // Use get() to retrieve all matching records
+    
+        // Extract the log entries from the collection of content types
+        $entries = $userLogEntries->flatMap(function ($contentType) {
+            return $contentType->auditLogEntries;
+        });
+    
+        // Return the filtered log entries (empty array if none)
+        return response()->json($entries);
+    }    
 }

@@ -77,6 +77,18 @@ const pendingBonusWithdrawal = ref(0);
             />
 
             <SidebarCollapsibleItem
+                :title="$t('public.orders')"
+                :href="route('crm.order.index')"
+                :active="route().current('crm.order.*')"
+            />
+
+            <SidebarCollapsibleItem
+                :title="$t('public.sale_orders')"
+                :href="route('crm.saleOrder.index')"
+                :active="route().current('crm.saleOrder.*')"
+            />
+
+            <SidebarCollapsibleItem
                 :title="$t('public.leads')"
                 :href="route('crm.lead.index')"
                 :active="route().current('crm.lead.*')"

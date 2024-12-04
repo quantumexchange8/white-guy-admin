@@ -42,7 +42,7 @@ const user = usePage().props.auth.user;
                 <div class="truncate text-gray-700 dark:text-gray-300 font-medium">{{ props.leadDetail?.deleted_note || '-' }}</div>
             </div>
         </div>
-        <div v-else class="w-full grid grid-cols-3 gap-5 animate-pulse">
+        <div v-else class="w-full grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-5 animate-pulse">
             <div class="flex flex-col gap-2">
                 <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.data_source') }}</div>
                 <div class="truncate text-gray-700 dark:text-gray-300 font-medium">

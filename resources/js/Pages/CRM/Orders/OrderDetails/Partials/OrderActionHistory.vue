@@ -1,7 +1,7 @@
 <script setup>
 import Button from "@/Components/Button.vue";
 import StatusBadge from "@/Components/StatusBadge.vue";
-import { IconPencilMinus, IconPhone } from "@tabler/icons-vue";
+import { IconPencilMinus, IconCircleCheck, IconCircleX } from "@tabler/icons-vue";
 import DefaultProfilePhoto from "@/Components/DefaultProfilePhoto.vue";
 import InputSwitch from "primevue/inputswitch";
 import { ref, watch, h } from "vue";
@@ -11,19 +11,16 @@ import Select from "primevue/select";
 import InputError from "@/Components/InputError.vue";
 import InputText from "primevue/inputtext";
 import { useForm } from "@inertiajs/vue3";
-import { generalFormat, transactionFormat } from "@/Composables/index.js";
+import { generalFormat, transactionFormat, formatToUserTimezone } from "@/Composables/index.js";
 import { useConfirm } from "primevue/useconfirm";
 import { trans } from "laravel-vue-i18n";
 import { router } from "@inertiajs/vue3";
-import Tabs from 'primevue/tabs';
-import TabList from 'primevue/tablist';
-import Tab from 'primevue/tab';
-import TabPanels from 'primevue/tabpanels';
-import TabPanel from 'primevue/tabpanel';
 import { wTrans } from "laravel-vue-i18n";
 import { usePage } from "@inertiajs/vue3";
-import BasicInfoTab from "@/Pages/CRM/Leads/LeadDetails/Partials/Tabs/BasicInfoTab.vue";
-import FinancialDetailTab from "@/Pages/CRM/Leads/LeadDetails/Partials/Tabs/FinancialDetailTab.vue";
+import Accordion from 'primevue/accordion';
+import AccordionPanel from 'primevue/accordionpanel';
+import AccordionHeader from 'primevue/accordionheader';
+import AccordionContent from 'primevue/accordioncontent';
 import dayjs from "dayjs";
 import utc from 'dayjs/plugin/utc'
 import timezone from 'dayjs/plugin/timezone'
@@ -34,15 +31,28 @@ dayjs.extend(timezone);
 const user = usePage().props.auth.user;
 
 const props = defineProps({
-    leadFront: Object,
+    order: Object,
     isLoading: Boolean,
 })
 
+const orderNotes = ref();
 const visible = ref(false)
 // const countries = ref(props.countries)
 const selectedCountry = ref();
 const { formatRgbaColor } = generalFormat();
 const { formatAmount } = transactionFormat();
+
+const getorderNotes = async () => {
+    try {
+        const response = await axios.get(`/crm/order/getOrderLogEntries?id=` + props.order.id);
+
+        orderNotes.value = response.data;
+    } catch (error) {
+        console.error('Error get network:', error);
+    }
+};
+
+getorderNotes();
 
 const openDialog = () => {
     visible.value = true
@@ -57,11 +67,11 @@ const form = useForm({
     phone_number: '',
 });
 
-// watch(() => props.leadFront, (user) => {
-//     form.user_id = props.leadFront.id
-//     form.name = props.leadFront.name
-//     form.email = props.leadFront.email
-//     form.phone = props.leadFront.phone
+// watch(() => props.orderNotes, (user) => {
+//     form.user_id = props.orderNotes.id
+//     form.name = props.orderNotes.name
+//     form.email = props.orderNotes.email
+//     form.phone = props.orderNotes.phone
 
 //     // Set selectedCountry based on dial_code
 //     // selectedCountry.value = countries.value.find(country => country.phone_code === user.dial_code);
@@ -82,35 +92,45 @@ const submitForm = () => {
     });
 };
 
-const tabs = ref([
-    {   
-        title: wTrans('public.lead_details'),
-        type: 'lead_details',
-        component: h(BasicInfoTab),
-    },
-    {   
-        title: wTrans('public.data_and_appointment'),
-        type: 'data_and_appointment',
-        component: h(FinancialDetailTab),
-    },
-]);
-
-const selectedType = ref('lead_details');
-const activeIndex = ref(tabs.value.findIndex(tab => tab.type === selectedType.value));
-
-// Watch for changes in selectedType and update the activeIndex accordingly
-watch(selectedType, (newType) => {
-    const index = tabs.value.findIndex(tab => tab.type === newType);
-    if (index >= 0) {
-        activeIndex.value = index;
-        getResults();
+const formatLogChanges = (value) => {
+    const pattern = /^(?:(?:19|20|21)\d{2})-(?:(?:0[1-9])|(?:1[0-2]))-(?:(?:0[1-9])|(?:[12][0-9])|(?:3[01]))\s(?:[01][0-9]|2[0-3]):(?:[0-5][0-9]):(?:[0-5][0-9])\.(?:\d{6})/;
+    
+    //Check if the value is a valid date format
+    if (pattern.test(value)) {
+        // Format the date value
+        return dayjs(value + '+00').tz(userTimezone).format('YYYY-MM-DD HH:mm:ss');
+    } else {
+        return value;
     }
-});
-
-function updateType(event) {
-    const selectedTab = tabs.value[event.index];
-    selectedType.value = selectedTab.type;
 }
+
+// Function to parse the changes string from a log entry
+const extractChanges = (changes) => {
+    let parsedChanges;
+    try {
+        parsedChanges = JSON.parse(changes);  // Parsing the changes JSON string into an object
+    } catch (error) {
+        console.error("Error parsing changes:", error);
+        return {}; // Return empty if there's an error parsing
+    }
+
+    const changeEntries = {};
+
+    // Loop through the parsed changes to extract key, old, and new values
+    Object.keys(parsedChanges).forEach(key => {
+        const [oldValue, newValue] = parsedChanges[key];  // Assuming the value is an array [oldValue, newValue]
+
+        // Only include changes where the old and new values differ
+        if (oldValue !== newValue) {
+            changeEntries[key] = { old: oldValue, new: newValue };
+        }
+    });
+
+    //   // Log the changeEntries for debugging purposes
+    //   console.log(changeEntries);
+
+    return changeEntries;  // Return an object with the keys, old, and new values
+};
 
 </script>
 
@@ -118,58 +138,75 @@ function updateType(event) {
     <div class="w-full flex flex-col items-center p-3 gap-3 self-stretch rounded-lg bg-white dark:bg-gray-800 shadow-card md:px-6 md:py-5">
         <div class="flex flex-col justify-center items-center gap-2 self-stretch">
             <div class="flex justify-between items-start self-stretch">
-                <span class="w-full text-gray-950 dark:text-gray-100 font-bold text-xxl break-words">{{ $t('public.lead_front_details') }}</span>
-                <Button
+                <span class="w-full text-gray-950 dark:text-white font-bold text-xxl break-words">{{ $t('public.order_notes') }}</span>
+                <!-- <Button
                     type="button"
                     iconOnly
                     size="base"
                     variant="gray-text"
                     pill
                     @click="openDialog()"
-                    :disabled="!leadFront && isLoading"
+                    :disabled="!orderNotes"
                 >
                     <IconPencilMinus size="20" />
-                </Button>
-            </div>
-            <div v-if="isLoading" class="animate-pulse flex flex-col items-start gap-1.5 self-stretch">
-                <div class="h-4 bg-gray-200 rounded-full w-48 my-2 md:my-3"></div>
-            </div>
-            <div v-else class="flex flex-col items-start gap-1 self-stretch">
-                <div class="grid items-start gap-1 self-stretch">
-                    <span class="w-full truncate self-stretch text-gray-950 dark:text-gray-100 text-xl font-bold">
-                        {{ leadFront?.name ? leadFront.name : '-' }}
-                    </span>
-                    <span class="w-full truncate self-stretch text-gray-500 dark:text-gray-100 text-sm font-bold">
-                        {{ leadFront?.email ? leadFront.email : '-' }}
-                    </span>
-                    <div class="w-full truncate flex items-start gap-1 self-stretch">
-                        <IconPhone size="20" stroke-width="1.25" class="text-gray-500" />
-                        <span class="w-full truncate self-stretch text-gray-500 dark:text-gray-100 text-sm font-bold">
-                            {{ leadFront?.phone_number ? leadFront.phone_number : '-' }}
-                        </span>
-                    </div>
-                </div>
-                <Tabs v-model:value="activeIndex" class="w-full" @tab-change="updateType" >
-                    <TabList>
-                        <Tab 
-                            v-for="(tab, index) in tabs" 
-                            :key="tab.title"
-                            :value="index"
-                        >
-                            {{ tab.title }}
-                        </Tab>
-                    </TabList>
-                </Tabs>
+                </Button> -->
             </div>
         </div>
         <div class="h-[1px] self-stretch bg-gray-200" />
-        <component 
-            v-if="tabs[activeIndex].component"
-            :is="tabs[activeIndex].component" 
-            key="tabs[activeIndex].type" 
-            :leadFront="props.leadFront"
-            :isLoading="isLoading"
-        />
+        <!-- Accordion to display order notes -->
+        <Accordion multiple class="w-full max-h-[600px] overflow-auto">
+            <div v-if="isLoading" class="animate-pulse flex flex-col items-start gap-1.5 self-stretch">
+                <div class="h-20 bg-gray-200 rounded-xl w-full my-2 md:my-3"></div>
+            </div>
+            <AccordionPanel
+                v-else
+                v-for="(note, index) in orderNotes" 
+                :key="note.id" 
+                :value="index"
+            >
+                <div class="w-full flex gap-2">
+                    <!-- dot on the top-left -->
+                    <div class="flex flex-col items-center">
+                        <div 
+                            class="w-3 h-3 rounded-full grow-0 shrink-0"
+                            :class="`bg-info-500`"
+                        >
+                        </div>
+                        <div class="w-0.5 h-full bg-gray-200 dark:bg-gray-500 "></div>
+                    </div>
+                    
+                    <div
+                        class="w-full flex flex-col border-b-gray-200 dark:border-b-gray-500"
+                        :class="{
+                            'py-2 border-b': index !== 0 && index !== orderNotes.length - 1,
+                            'pb-2 border-b': index === 0,
+                            'pt-2': index === orderNotes.length - 1
+                        }"
+                    >
+                        <div class="flex flex-col items-center pt-2 gap-1">
+                            <h3 class="self-stretch text-gray-950 dark:text-gray-100 font-semibold">{{ `[${$t('public.system')}]: ` + (note.action === 0 ? 'Newly created' : 'Updated') }}</h3>
+                            <span class="self-stretch text-sm text-gray-500 dark:text-gray-400">{{ note.created_at }}</span>
+                        </div>
+                        <AccordionHeader class="px-2 text-start">{{ `${$t('public.note_details')}&nbsp;(${note.id})` }}</AccordionHeader>
+                        <AccordionContent>
+                            <div class="w-full flex flex-col items-center p-2">
+                                <!-- Loop through all changes dynamically -->
+                                <div v-for="(change, key) in extractChanges(note.changes)" :key="key" class="w-full flex flex-col items-start justify-center gap-1">
+                                    <span class="text-gray-950 dark:text-gray-100">
+                                        ◉ [{{ $t('public.' + key) }}]
+                                    </span>
+
+                                    <span class="truncate text-gray-500 dark:text-gray-300 font-semibold ml-4">
+                                        <!-- Use dynamic translation with correct keys and values -->
+                                        ➤ {{ $t('public.change_message', { key: $t('public.' + key), old: `"${formatLogChanges(change.old)}"`, new: `"${formatLogChanges(change.new)}"`  }) }}
+                                    </span>
+                                </div>
+                            </div>
+                        </AccordionContent>
+                    </div>
+                </div>
+            </AccordionPanel>
+        </Accordion>
     </div>
 
     <!-- edit contact info -->

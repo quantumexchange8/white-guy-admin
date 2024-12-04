@@ -2,7 +2,7 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import { usePage } from "@inertiajs/vue3";
 import { IconCircleXFilled, IconSearch, IconDownload, IconFilterOff } from "@tabler/icons-vue";
-import { ref, watch, watchEffect, onMounted } from "vue";
+import { ref, watch, watchEffect, onMounted, nextTick } from "vue";
 import Loader from "@/Components/Loader.vue";
 import Dialog from "primevue/dialog";
 import DataTable from "primevue/datatable";
@@ -19,7 +19,7 @@ import timezone from 'dayjs/plugin/timezone'
 import { trans, wTrans } from "laravel-vue-i18n";
 import DatePicker from 'primevue/datepicker';
 import debounce from "lodash/debounce.js";
-import LeadActions from "@/Pages/CRM/Leads/Partials/LeadActions.vue";
+import OrderActions from "@/Pages/CRM/Orders/Partials/OrderActions.vue";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -28,30 +28,16 @@ const { formatAmount } = transactionFormat();
 
 const user = usePage().props.auth.user;
 
+let skipProcess = false;
 const visible = ref(false);
 const loading = ref(false);
 const dt = ref(null);
-const transactions = ref([]);
+const orders = ref([]);
 const totalRecords = ref(0);
 const rows = ref(10);
 const page = ref(0);
 const sortField = ref(null);  
 const sortOrder = ref(null);  // (1 for ascending, -1 for descending)
-const filters = ref({
-    global: null,
-});
-
-const clearFilterGlobal = () => {
-    filters.value.global = null;
-}
-
-const clearFilter = () => {
-    filters.value.global = null;
-    selectedDate.value = [minDate.value, maxDate.value];
-    sortField.value = null;
-    sortOrder.value = null;
-    rows.value = 10;
-};
 
 // Get current date
 const today = new Date();
@@ -68,11 +54,28 @@ const clearDate = () => {
     selectedDate.value = [];
 };
 
+const filters = ref({
+    global: null,
+});
+
+const clearFilterGlobal = () => {
+    filters.value.global = null;
+}
+
+const clearFilter = () => {
+    skipProcess = true;
+    filters.value.global = null;
+    sortField.value = null;
+    sortOrder.value = null;
+    rows.value = 10;
+    skipProcess = false;
+};
+
 const getResults = async (dateRanges = null) => {
     loading.value = true;
     try {
         // Define the base URL
-        let url = `/crm/lead/getLeads?rows=${rows.value}&page=${page.value}`;
+        let url = `/crm/order/getOrders?rows=${rows.value}&page=${page.value}`;
 
         // If date ranges are provided, append startDate and endDate to the URL
         if (dateRanges) {
@@ -80,23 +83,23 @@ const getResults = async (dateRanges = null) => {
             url += `&startDate=${dayjs(startDate).format('YYYY-MM-DD')}&endDate=${dayjs(endDate).format('YYYY-MM-DD')}`;
         }
 
-        if (sortField.value && sortOrder.value !== null) {
-            url += `&sortField=${sortField.value}&sortOrder=${sortOrder.value}`;
-        }
-
         if (filters.value.global) {
             url += `&search=${filters.value.global}`;
+        }
+
+        if (sortField.value && sortOrder.value !== null) {
+            url += `&sortField=${sortField.value}&sortOrder=${sortOrder.value}`;
         }
 
         // Make the API request
         const response = await axios.get(url);
         
         // Update the data and total records with the response
-        transactions.value = response.data.data;
+        orders.value = response.data.data;
         totalRecords.value = response.data.totalRecords;
     } catch (error) {
         console.error('Error fetching leads data:', error);
-        transactions.value = [];
+        orders.value = [];
     } finally {
         loading.value = false;
     }
@@ -215,10 +218,10 @@ const openDialog = (rowData) => {
 </script>
 
 <template>
-    <AuthenticatedLayout :title="`${$t('public.leads')}`">
+    <AuthenticatedLayout :title="`${$t('public.orders')}`">
         <div class="flex flex-col justify-center items-center px-3 py-5 self-stretch rounded-lg bg-white dark:bg-gray-800 shadow-card md:p-6 md:gap-6">
             <div class="flex flex-col pb-3 gap-3 items-center self-stretch md:flex-row md:gap-0 md:justify-between md:pb-0">
-                <span class="text-gray-950 dark:text-gray-100 font-semibold self-stretch md:self-auto">{{ $t('public.leads') }}</span>
+                <span class="text-gray-950 dark:text-gray-100 font-semibold self-stretch md:self-auto">{{ $t('public.orders') }}</span>
                 <div class="flex flex-col gap-3 items-center self-stretch md:flex-row md:gap-5">
                     <div class="relative w-full md:w-60">
                         <div class="absolute top-2/4 -mt-[9px] left-4 text-gray-500 dark:text-gray-300">
@@ -233,7 +236,7 @@ const openDialog = (rowData) => {
                             <IconCircleXFilled size="20" />
                         </div>
                     </div>
-                    <Button variant="primary-outlined" @click="exportXLSX()" :disabled="transactions.length <= 0" class="w-full md:w-auto">
+                    <Button variant="primary-outlined" @click="exportXLSX()" :disabled="orders.length <= 0" class="w-full md:w-auto">
                         <IconDownload size="20" stroke-width="1.25" />
                         {{ $t('public.export') }}
                     </Button>
@@ -242,7 +245,7 @@ const openDialog = (rowData) => {
             <DataTable
                 ref="dt"
                 :loading="loading"
-                :value="transactions"
+                :value="orders"
                 lazy
                 removableSort
                 :paginator="true"
@@ -275,7 +278,7 @@ const openDialog = (rowData) => {
                                 />
                                 <div
                                     v-if="selectedDate && selectedDate.length > 0"
-                                    class="absolute top-[11px] right-3 flex justify-center items-center text-gray-400 select-none cursor-pointer bg-white dark:bg-gray-800 w-6 h-6 "
+                                    class="absolute top-[11px] right-3 flex justify-center items-center text-gray-400 select-none cursor-pointer bg-white dark:bg-gray-900 w-6 h-6 "
                                     @click="clearDate"
                                 >
                                     <IconCircleXFilled size="20" />
@@ -315,52 +318,46 @@ const openDialog = (rowData) => {
                         <span class="text-sm text-gray-700 dark:text-gray-100">{{ $t('public.loading') }}</span>
                     </div>
                 </template>
-                <template v-if="transactions?.length > 0">
-                    <Column field="last_name" sortable :header="$t('public.name')" class="w-3/4 md:w-[20%] max-w-0 px-3">
+                <template v-if="orders?.length > 0">
+                    <Column field="created_at" :header="`${$t('public.date')}`" sortable class="hidden md:table-cell w-[20%] max-w-0">
                         <template #body="slotProps">
-                            <div class="flex flex-col items-start max-w-full">
-                                <div class="text-gray-950 dark:text-gray-100 font-semibold truncate max-w-full">
-                                    {{ slotProps.data.last_name }}&nbsp;{{ slotProps.data.first_name }}
-                                </div>
-                                <div class="text-gray-500 dark:text-gray-300 text-xs truncate max-w-full">
-                                    {{ slotProps.data.email }}
-                                </div>
+                            <div class="text-gray-950 dark:text-gray-100 text-sm">
+                                {{ slotProps.data.created_at || '-' }}
                             </div>
                         </template>
                     </Column>
-                    <Column field="created_at" :header="$t('public.date')" sortable class="hidden md:table-cell w-full md:w-[15%] max-w-0">
+                    <Column field="trade_id" :header="$t('public.trade_id')" sortable class="hidden md:table-cell w-full md:w-[15%] max-w-0">
                         <template #body="slotProps">
                             <div class="text-gray-950 dark:text-gray-100 text-sm truncate max-w-full">
-                                <!-- {{ slotProps.data.created_at ? formatToUserTimezone(slotProps.data.created_at, user.timezone, true) : '-' }} -->
-                                {{ slotProps.data.created_at ? slotProps.data.created_at : '-' }}
+                                {{ slotProps.data.trade_id ? slotProps.data.trade_id : '-' }}
                             </div>
                         </template>
                     </Column>
-                    <Column field="assignee" :header="$t('public.assignee')" class="hidden md:table-cell w-[15%]">
+                    <Column field="action_type" :header="`${$t('public.action')}`" class="hidden md:table-cell w-[15%] max-w-0">
                         <template #body="slotProps">
                             <div class="text-gray-950 dark:text-gray-100 text-sm">
-                                {{ slotProps.data.assignee?.username || '-' }}{{ slotProps.data.assignee?.site?.name ? ` (${slotProps.data.assignee.site.name})` : '' }}
+                                {{ slotProps.data.action_type ? slotProps.data.action_type : '-' }}
                             </div>
                         </template>
                     </Column>
-                    <Column field="contacted_at" :header="`${$t('public.contacted_at')}`" sortable class="hidden md:table-cell w-[20%]">
+                    <Column field="status" :header="`${$t('public.status')}`" class="hidden md:table-cell w-[20%] max-w-0">
                         <template #body="slotProps">
                             <div class="text-gray-950 dark:text-gray-100 text-sm">
-                                {{ slotProps.data.contacted_at ? dayjs(slotProps.data.contacted_at).format('YYYY/MM/DD') : '-' }}
+                                {{ slotProps.data.status ? slotProps.data.status : '-' }}
                             </div>
                         </template>
                     </Column>
-                    <Column field="give_up_at" :header="`${$t('public.give_up')}`" sortable class="hidden md:table-cell w-[20%]">
+                    <Column field="amount" :header="`${$t('public.amount')}&nbsp;($)`" class="hidden md:table-cell w-[20%] max-w-0">
                         <template #body="slotProps">
                             <div class="text-gray-950 dark:text-gray-100 text-sm">
-                                {{ slotProps.data.give_up_at ? dayjs(slotProps.data.give_up_at).format('YYYY/MM/DD') : '-' }}
+                                {{ slotProps.data.action_type === 'SELL' ? formatAmount(slotProps.data.profit) : (slotProps.data.action_type === 'BUY' ? formatAmount(slotProps.data.unit_price * slotProps.data.quantity) : '-') }}
                             </div>
                         </template>
                     </Column>
-                    <Column field="action" :header="`${$t('public.action')}`" class="w-1/4 md:w-[10%] px-3">
+                    <Column field="action" :header="`${$t('public.action')}`" class="w-1/4 md:w-[10%] max-w-0 px-3">
                         <template #body="slotProps">
-                            <LeadActions 
-                                :lead="slotProps.data"
+                            <OrderActions 
+                                :order="slotProps.data"
                             />
                         </template>
                     </Column>
@@ -369,50 +366,72 @@ const openDialog = (rowData) => {
         </div>
     </AuthenticatedLayout>
 
-    <Dialog v-model:visible="visible" modal :header="$t('public.lead_details')" class="dialog-xs md:dialog-md">
+    <Dialog v-model:visible="visible" modal :header="$t('public.orders_details')" class="dialog-xs md:dialog-md">
         <div class="flex flex-col justify-center items-center gap-3 self-stretch pt-4 md:pt-6">
-            <div class="flex flex-col justify-between items-center p-3 gap-3 self-stretch bg-gray-50 dark:bg-gray-700 md:flex-row">
+            <div class="flex flex-col-reverse justify-between items-center p-3 gap-1 self-stretch bg-gray-50 dark:bg-gray-700 md:flex-row">
                 <div class="flex flex-col items-start w-full truncate">
-                    <span class="w-full truncate text-gray-950 dark:text-gray-100 font-semibold">{{ data.last_name }}&nbsp;{{ data.first_name }}</span>
-                    <span class="w-full truncate text-gray-500 dark:text-gray-300 text-sm">{{ data.email }}</span>
+                    <span class="w-full truncate text-gray-950 dark:text-gray-100 font-semibold">{{ data.user?.full_name }} {{ data.user?.site?.name ? ` (${data.user?.site.name})` : '' }}</span>
+                    <span class="w-full truncate text-gray-500 dark:text-gray-300 text-sm">{{ data.user?.email }}</span>
+                </div>
+                <div class="flex flex-col w-full truncate">
+                    <span class="w-full truncate md:text-right text-xxl text-gray-950 dark:text-gray-100 font-bold">$&nbsp;{{ data.action_type === 'SELL' ? formatAmount(data.profit) : (data.action_type === 'BUY' ? formatAmount(data.unit_price * data.quantity) : '-') }}</span>
                 </div>
             </div>
             
             <div class="flex flex-col items-center p-3 gap-3 self-stretch bg-gray-50 dark:bg-gray-700">
                 <div class="w-full flex flex-col items-start gap-1 md:flex-row">
-                    <span class="w-full max-w-[200px] truncate text-gray-500 dark:text-gray-300 text-sm">{{ $t('public.phone_number') }}</span>
-                    <span class="w-full truncate text-gray-950 dark:text-gray-100 text-sm font-medium">{{ data.phone_number ?? '-' }}</span>
+                    <span class="w-full max-w-[200px] truncate text-gray-500 dark:text-gray-300 text-sm">{{ $t('public.trade_id') }}</span>
+                    <span class="w-full truncate text-gray-950 dark:text-gray-100 text-sm font-medium">{{ data?.trade_id ? data?.trade_id : '-' }}</span>
                 </div>
                 <div class="w-full flex flex-col items-start gap-1 md:flex-row">
-                    <span class="w-full max-w-[200px] truncate text-gray-500 dark:text-gray-300 text-sm">{{ $t('public.contacted_at') }}</span>
-                    <span class="w-full truncate text-gray-950 dark:text-gray-100 text-sm font-medium">{{ data.contacted_at ? dayjs(data.contacted_at).format('YYYY/MM/DD') : '-' }}</span>
+                    <span class="w-full max-w-[200px] truncate text-gray-500 dark:text-gray-300 text-sm">{{ $t('public.date') }}</span>
+                    <span class="w-full truncate text-gray-950 dark:text-gray-100 text-sm font-medium">{{ data?.created_at ? data.created_at : '-' }}</span>
                 </div>
                 <div class="w-full flex flex-col items-start gap-1 md:flex-row">
-                    <span class="w-full max-w-[200px] truncate text-gray-500 dark:text-gray-300 text-sm">{{ $t('public.give_up') }}</span>
-                    <span class="w-full truncate text-gray-950 dark:text-gray-100 text-sm font-medium">{{ data.give_up_at ? dayjs(data.give_up_at).format('YYYY/MM/DD') : '-' }}</span>
+                    <span class="w-full max-w-[200px] truncate text-gray-500 dark:text-gray-300 text-sm">{{ $t('public.action_type') }}</span>
+                    <span class="w-full truncate text-gray-950 dark:text-gray-100 text-sm font-medium">{{ data?.action_type ? data.action_type : '-' }}</span>
                 </div>
                 <div class="w-full flex flex-col items-start gap-1 md:flex-row">
-                    <span class="w-full max-w-[200px] truncate text-gray-500 dark:text-gray-300 text-sm">{{ $t('public.country') }}</span>
-                    <span class="w-full truncate text-gray-950 dark:text-gray-100 text-sm font-medium">{{ data.country !== '' ? data.country : '-' }}</span>
+                    <span class="w-full max-w-[200px] truncate text-gray-500 dark:text-gray-300 text-sm">{{ $t('public.action_type') }}</span>
+                    <span class="w-full truncate text-gray-950 dark:text-gray-100 text-sm font-medium">{{ data?.action_type ? data.action_type : '-' }}</span>
+                </div>
+                <div class="w-full flex flex-col items-start gap-1 md:flex-row">
+                    <span class="w-full max-w-[200px] truncate text-gray-500 dark:text-gray-300 text-sm">{{ $t('public.stage') }}</span>
+                    <span class="w-full truncate text-gray-950 dark:text-gray-100 text-sm font-medium">{{ data?.limb_stage ? data.limb_stage : '-' }}</span>
                 </div>
             </div>
 
             <div class="flex flex-col items-center p-3 gap-3 self-stretch bg-gray-50 dark:bg-gray-700">
                 <div class="w-full flex flex-col items-start gap-1 md:flex-row">
-                    <span class="w-full max-w-[200px] truncate text-gray-500 dark:text-gray-300 text-sm">{{ $t('public.vc') }}</span>
-                    <span class="w-full truncate text-gray-950 dark:text-gray-100 text-sm font-medium">{{ data.vc !== '' ? data.vc : '-' }}</span>
+                    <span class="w-full max-w-[200px] truncate text-gray-500 dark:text-gray-300 text-sm">{{ $t('public.stock') }}</span>
+                    <span class="w-full truncate text-gray-950 dark:text-gray-100 text-sm font-medium">{{ data?.stock ? data.stock : '-' }}</span>
                 </div>
                 <div class="w-full flex flex-col items-start gap-1 md:flex-row">
-                    <span class="w-full max-w-[200px] truncate text-gray-500 dark:text-gray-300 text-sm">{{ $t('public.data_type') }}</span>
-                    <span class="w-full truncate text-gray-950 dark:text-gray-100 text-sm font-medium">{{ data.data_type !== '' ? data.data_type : '-' }}</span>
+                    <span class="w-full max-w-[200px] truncate text-gray-500 dark:text-gray-300 text-sm">{{ $t('public.stock_type') }}</span>
+                    <span class="w-full truncate text-gray-950 dark:text-gray-100 text-sm font-medium">{{ data?.stock_type ? data.stock_type : '-' }}</span>
                 </div>
                 <div class="w-full flex flex-col items-start gap-1 md:flex-row">
-                    <span class="w-full max-w-[200px] truncate text-gray-500 dark:text-gray-300 text-sm">{{ $t('public.data_source') }}</span>
-                    <span class="w-full truncate text-gray-950 dark:text-gray-100 text-sm font-medium">{{ data.data_source !== '' ? data.data_source : '-' }}</span>
+                    <span class="w-full max-w-[200px] truncate text-gray-500 dark:text-gray-300 text-sm">{{ $t('public.quantity') }}</span>
+                    <span class="w-full truncate text-gray-950 dark:text-gray-100 text-sm font-medium">{{ data?.quantity ? data.quantity : '-' }}</span>
                 </div>
                 <div class="w-full flex flex-col items-start gap-1 md:flex-row">
-                    <span class="w-full max-w-[200px] truncate text-gray-500 dark:text-gray-300 text-sm">{{ $t('public.data_code') }}</span>
-                    <span class="w-full truncate text-gray-950 dark:text-gray-100 text-sm font-medium">{{ data.data_code !== '' ? data.data_code : '-' }}</span>
+                    <span class="w-full max-w-[200px] truncate text-gray-500 dark:text-gray-300 text-sm">{{ $t('public.unit_price') }}</span>
+                    <span class="w-full truncate text-gray-950 dark:text-gray-100 text-sm font-medium">{{ data?.unit_price ? data.unit_price : '-' }}</span>
+                </div>
+                <div class="w-full flex flex-col items-start gap-1 md:flex-row">
+                    <span class="w-full max-w-[200px] truncate text-gray-500 dark:text-gray-300 text-sm">{{ $t('public.current_unit_price') }}</span>
+                    <span class="w-full truncate text-gray-950 dark:text-gray-100 text-sm font-medium">{{ data?.current_unit_price ? data.current_unit_price : '-' }}</span>
+                </div>
+            </div>
+
+            <div class="flex flex-col items-center p-3 gap-3 self-stretch bg-gray-50 dark:bg-gray-700">
+                <div class="w-full flex flex-col items-start gap-1 md:flex-row">
+                    <span class="w-full max-w-[200px] truncate text-gray-500 dark:text-gray-300 text-sm">{{ $t('public.confirmation_name') }}</span>
+                    <span class="w-full truncate text-gray-950 dark:text-gray-100 text-sm font-medium">{{ data?.confirmation_name ? data.confirmation_name : '-' }}</span>
+                </div>
+                <div class="w-full flex flex-col items-start gap-1 md:flex-row">
+                    <span class="w-full max-w-[200px] truncate text-gray-500 dark:text-gray-300 text-sm">{{ $t('public.confirmed_at') }}</span>
+                    <span class="w-full truncate text-gray-950 dark:text-gray-100 text-sm font-medium">{{ data?.confirmed_at ? data.confirmed_at : '-' }}</span>
                 </div>
             </div>
         </div>

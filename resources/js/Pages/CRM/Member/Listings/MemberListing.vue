@@ -31,7 +31,7 @@ const user = usePage().props.auth.user;
 const visible = ref(false);
 const loading = ref(false);
 const dt = ref(null);
-const transactions = ref([]);
+const members = ref([]);
 const totalRecords = ref(0);
 const rows = ref(10);
 const page = ref(0);
@@ -56,7 +56,7 @@ const getResults = async () => {
     loading.value = true;
     try {
         // Define the base URL
-        let url = `/crm/member/getMemberListing?rows=${rows.value}&page=${page.value}`;
+        let url = `/crm/member/getMembers?rows=${rows.value}&page=${page.value}`;
 
         if (filters.value.global) {
             url += `&search=${filters.value.global}`;
@@ -70,11 +70,11 @@ const getResults = async () => {
         const response = await axios.get(url);
         
         // Update the data and total records with the response
-        transactions.value = response.data.data;
+        members.value = response.data.data;
         totalRecords.value = response.data.totalRecords;
     } catch (error) {
         console.error('Error fetching leads data:', error);
-        transactions.value = [];
+        members.value = [];
     } finally {
         loading.value = false;
     }
@@ -172,11 +172,11 @@ const openDialog = (rowData) => {
 
 <template>
     <AuthenticatedLayout :title="`${$t('public.member_listing')}`">
-        <div class="flex flex-col justify-center items-center px-3 py-5 self-stretch rounded-lg bg-white dark:bg-gray-800 shadow-card md:p-6 md:gap-6">
+        <div class="flex flex-col justify-center items-center px-3 py-5 self-stretch rounded-lg bg-white dark:bg-gray-900 shadow-card md:p-6 md:gap-6">
             <div class="flex flex-col pb-3 gap-3 items-center self-stretch md:flex-row md:gap-0 md:justify-between md:pb-0">
                 <span class="text-gray-950 dark:text-gray-100 font-semibold self-stretch md:self-auto">{{ $t('public.member_listing') }}</span>
                 <div class="flex flex-col gap-3 items-center self-stretch md:flex-row md:gap-5">
-                    <Button variant="primary-outlined" @click="exportXLSX()" :disabled="transactions.length <= 0" class="w-full md:w-auto">
+                    <Button variant="primary-outlined" @click="exportXLSX()" :disabled="members.length <= 0" class="w-full md:w-auto">
                         <IconDownload size="20" stroke-width="1.25" />
                         {{ $t('public.export') }}
                     </Button>
@@ -185,7 +185,7 @@ const openDialog = (rowData) => {
             <DataTable
                 ref="dt"
                 :loading="loading"
-                :value="transactions"
+                :value="members"
                 lazy
                 removableSort
                 :paginator="true"
@@ -251,7 +251,7 @@ const openDialog = (rowData) => {
                         <span class="text-sm text-gray-700 dark:text-gray-300">{{ $t('public.loading') }}</span>
                     </div>
                 </template>
-                <template v-if="transactions?.length > 0">
+                <template v-if="members?.length > 0">
                     <Column field="username" sortable :header="$t('public.name')" class="w-3/4 md:w-[20%] max-w-0 px-3">
                         <template #body="slotProps">
                             <div class="flex flex-col items-start max-w-full">

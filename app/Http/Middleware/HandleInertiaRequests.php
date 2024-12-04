@@ -38,6 +38,7 @@ class HandleInertiaRequests extends Middleware
             'toast' => session('toast'),
             'locale' => session('locale') ? session('locale') : app()->getLocale(),
             // 'permissions' => $request->user() ? $request->user()->getAllPermissions()->pluck('name')->toArray() : 'no permission',
+            'timezone' => $request->user() ? $request->user()->timezone : config('app.timezone'),
         ];
     }
 }

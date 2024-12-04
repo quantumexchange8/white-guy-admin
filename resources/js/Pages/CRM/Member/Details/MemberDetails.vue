@@ -1,18 +1,55 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { usePage, useForm } from "@inertiajs/vue3";
-import { ref, watchEffect } from "vue";
+import { h, ref, watch, watchEffect } from "vue";
 import { IconChevronRight } from '@tabler/icons-vue';
 import Button from '@/Components/Button.vue';
+import Tabs from 'primevue/tabs';
+import TabList from 'primevue/tablist';
+import Tab from 'primevue/tab';
+import TabPanels from 'primevue/tabpanels';
+import TabPanel from 'primevue/tabpanel';
+import { trans, wTrans } from "laravel-vue-i18n";
 import MemberDetailInfo from '@/Pages/CRM/Member/Details/Partials/MemberDetailInfo.vue';
 import MemberAccountInfo from '@/Pages/CRM/Member/Details/Partials/MemberAccountInfo.vue';
 import MemberOrders from '@/Pages/CRM/Member/Details/Partials/MemberOrders.vue';
+import MemberActionHistory from '@/Pages/CRM/Member/Details/Partials/MemberActionHistory.vue';
 
 const user = usePage().props.auth.user;
 
 const props = defineProps({
     member: Object,
 })
+
+const tabs = ref([
+    {   
+        title: wTrans('public.orders'),
+        type: 'member_order',
+        component: h(MemberOrders, {member: props.member}),
+    },
+    {   
+        title: wTrans('public.history'),
+        type: 'history',
+        component: h(MemberActionHistory, {member: props.member}),
+    },
+]);
+
+const selectedType = ref('member_order');
+const activeIndex = ref(tabs.value.findIndex(tab => tab.type === selectedType.value));
+
+// Watch for changes in selectedType and update the activeIndex accordingly
+watch(selectedType, (newType) => {
+    const index = tabs.value.findIndex(tab => tab.type === newType);
+    if (index >= 0) {
+        activeIndex.value = index;
+        getResults();
+    }
+});
+
+function updateType(event) {
+    const selectedTab = tabs.value[event.index];
+    selectedType.value = selectedTab.type;
+}
 
 const memberDetail = ref();
 const isLoading = ref(false);
@@ -70,10 +107,23 @@ watchEffect(() => {
                     :memberDetail="memberDetail"
                     :isLoading="isLoading"
                 />
-                <div class="w-full grid col-span-2">
-                    <MemberOrders
-                        :user_id="props.member.id"
-                    />
+                <div class="w-full grid col-span-1 md:col-span-2">
+                    <Tabs v-model:value="activeIndex" class="w-full gap-5" @tab-change="updateType" >
+                        <TabList>
+                            <Tab 
+                                v-for="(tab, index) in tabs" 
+                                :key="tab.title"
+                                :value="index"
+                            >
+                                {{ `${tab.title}` }}
+                        </Tab>
+                        </TabList>
+                        <TabPanels>
+                            <TabPanel :key="activeIndex" :value="activeIndex">
+                                <component :is="tabs[activeIndex].component" :key="tabs[activeIndex].type" :member="props.member" v-if="tabs[activeIndex].component"/>
+                            </TabPanel>
+                        </TabPanels>
+                    </Tabs>
                 </div>
             </div>
         </div>
