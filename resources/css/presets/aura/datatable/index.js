@@ -53,7 +53,7 @@ export default {
             props.showGridlines ? 'border-x border-t border-b-0' : 'border-y border-x-0',
 
             // Color
-            'bg-white dark:bg-gray-800',
+            'bg-white dark:bg-gray-900',
             'border-transparent',
             'text-gray-700 dark:text-gray-100'
         ]
@@ -64,7 +64,7 @@ export default {
     thead: ({ context }) => ({
         class: [
             {
-                'bg-white dark:bg-gray-800 top-0 z-10 sticky': context.scrollable
+                'bg-white dark:bg-gray-900 top-0 z-10 sticky': context.scrollable
             }
         ]
     }),
@@ -73,18 +73,18 @@ export default {
             {
                 'sticky z-20': instance.frozenRow && context.scrollable
             },
-            'bg-white dark:bg-gray-800'
+            'bg-white dark:bg-gray-900'
         ]
     }),
     tfoot: ({ context }) => ({
         class: [
             {
-                'bg-white dark:bg-gray-800 bottom-0 z-0': context.scrollable
+                'bg-white dark:bg-gray-900 bottom-0 z-0': context.scrollable
             }
         ]
     }),
     emptymessagecell: {
-        class: 'bg-white dark:bg-gray-800'
+        class: 'bg-white dark:bg-gray-900'
     },    
     footer: {
         class: [
@@ -97,7 +97,7 @@ export default {
             'p-4',
 
             // Color
-            'bg-white dark:bg-gray-800',
+            'bg-white dark:bg-gray-900',
             'border-gray-200 dark:border-gray-500',
             'text-gray-700 dark:text-gray-100'
         ]

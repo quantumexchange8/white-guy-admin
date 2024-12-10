@@ -158,57 +158,6 @@ watchEffect(() => {
     }
 });
 
-const exportXLSX = () => {
-    // Retrieve the array from the reactive proxy
-    const data = filteredValue.value;
-
-    // Specify the headers
-    const headers = [
-        trans('public.name'),
-        trans('public.email'),
-        trans('public.date'),
-        trans('public.account_type'),
-        trans('public.volume') + ' (Ł)',
-        trans('public.amount') + ' ($)'
-    ];
-
-    // Map the array data to XLSX rows
-    const rows = data.map(obj => {
-        return [
-            obj.name !== undefined ? obj.name : '',
-            obj.email !== undefined ? obj.email : '',
-            obj.execute_at !== undefined ? dayjs(obj.execute_at).format('YYYY/MM/DD') : '',
-            obj.account_type !== undefined ? trans('public.' + obj.account_type) : '',
-            obj.volume !== undefined ? obj.volume : '',
-            obj.rebate !== undefined ? obj.rebate : ''
-        ];
-    });
-
-    // Combine headers and rows into a single data array
-    const sheetData = [headers, ...rows];
-
-    // Create the XLSX content
-    let csvContent = "data:text/xlsx;charset=utf-8,";
-    
-    sheetData.forEach((rowArray) => {
-        const row = rowArray.join("\t"); // Use tabs for column separation
-        csvContent += row + "\r\n"; // Add a new line after each row
-    });
-
-    // Create a temporary link element
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", "export.xlsx");
-
-    // Append the link to the document and trigger the download
-    document.body.appendChild(link);
-    link.click();
-
-    // Clean up by removing the link
-    document.body.removeChild(link);
-};
-
 // dialog
 const data = ref({});
 const openDialog = (rowData) => {
@@ -319,10 +268,18 @@ const openDialog = (rowData) => {
                     </div>
                 </template>
                 <template v-if="sale_orders?.length > 0">
-                    <Column field="written_date" :header="`${$t('public.written_date')}`" sortable class="hidden md:table-cell w-[20%] max-w-0">
+                    <Column field="written_date" :header="`${$t('public.written_date')}`" sortable class="w-3/4 md:w-[20%] max-w-0 px-3">
                         <template #body="slotProps">
-                            <div class="text-gray-950 dark:text-gray-100 text-sm">
+                            <div class="text-gray-950 dark:text-gray-100 text-sm hidden md:block">
                                 {{ slotProps.data.written_date || '-' }}
+                            </div>
+                            <div class="flex flex-col items-start max-w-full md:hidden">
+                                <div class="text-gray-950 dark:text-gray-100 font-semibold truncate max-w-full">
+                                    {{ slotProps.data.registered_name ? slotProps.data.registered_name : '-' }}
+                                </div>
+                                <div class="text-gray-500 dark:text-gray-300 text-xs truncate max-w-full">
+                                    {{ slotProps.data.written_date ? slotProps.data.written_date : '-' }}
+                                </div>
                             </div>
                         </template>
                     </Column>

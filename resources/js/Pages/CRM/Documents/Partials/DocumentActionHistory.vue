@@ -31,28 +31,31 @@ dayjs.extend(timezone);
 const user = usePage().props.auth.user;
 
 const props = defineProps({
-    sale_order: Object,
-    isLoading: Boolean,
+    document: Object,
 })
 
-const saleOrderActionHistories = ref();
+const documentActionHistories = ref();
 const visible = ref(false)
 // const countries = ref(props.countries)
 const selectedCountry = ref();
+const isLoading = ref(false)
 const { formatRgbaColor } = generalFormat();
 const { formatAmount } = transactionFormat();
 
-const getSaleOrderActionHistory = async () => {
+const getDocumentActionHistory = async () => {
     try {
-        const response = await axios.get(`/crm/saleOrder/getSaleOrderLogEntries?id=` + props.sale_order.id);
+        isLoading.value = true;
+        const response = await axios.get(`/crm/document/getDocumentLogEntries?id=` + props.document.id);
 
-        saleOrderActionHistories.value = response.data;
+        documentActionHistories.value = response.data;
     } catch (error) {
         console.error('Error get network:', error);
+    } finally {
+        isLoading.value = false; // Set loading state to false after data fetch (success or failure)
     }
 };
 
-getSaleOrderActionHistory();
+getDocumentActionHistory();
 
 const openDialog = () => {
     visible.value = true
@@ -67,11 +70,11 @@ const form = useForm({
     phone_number: '',
 });
 
-// watch(() => props.SaleOrderNotes, (user) => {
-//     form.user_id = props.SaleOrderNotes.id
-//     form.name = props.SaleOrderNotes.name
-//     form.email = props.SaleOrderNotes.email
-//     form.phone = props.SaleOrderNotes.phone
+// watch(() => props.documentActionHistories, (user) => {
+//     form.user_id = props.documentActionHistories.id
+//     form.name = props.documentActionHistories.name
+//     form.email = props.documentActionHistories.email
+//     form.phone = props.documentActionHistories.phone
 
 //     // Set selectedCountry based on dial_code
 //     // selectedCountry.value = countries.value.find(country => country.phone_code === user.dial_code);
@@ -135,24 +138,7 @@ const extractChanges = (changes) => {
 </script>
 
 <template>
-    <div class="w-full flex flex-col items-center p-3 gap-3 self-stretch rounded-lg bg-white dark:bg-gray-800 shadow-card md:px-6 md:py-5">
-        <div class="flex flex-col justify-center items-center gap-2 self-stretch">
-            <div class="flex justify-between items-start self-stretch">
-                <span class="w-full text-gray-950 dark:text-white font-bold text-xxl break-words">{{ $t('public.order_notes') }}</span>
-                <!-- <Button
-                    type="button"
-                    iconOnly
-                    size="base"
-                    variant="gray-text"
-                    pill
-                    @click="openDialog()"
-                    :disabled="!SaleOrderNotes"
-                >
-                    <IconPencilMinus size="20" />
-                </Button> -->
-            </div>
-        </div>
-        <div class="h-[1px] self-stretch bg-gray-200" />
+    <div class="flex flex-col gap-6 items-center self-stretch py-4 md:py-6 md:gap-8">
         <!-- Accordion to display order notes -->
         <Accordion multiple class="w-full max-h-[600px] overflow-auto">
             <div v-if="isLoading" class="animate-pulse flex flex-col items-start gap-1.5 self-stretch">
@@ -160,7 +146,7 @@ const extractChanges = (changes) => {
             </div>
             <AccordionPanel
                 v-else
-                v-for="(note, index) in saleOrderActionHistories" 
+                v-for="(note, index) in documentActionHistories" 
                 :key="note.id" 
                 :value="index"
             >
@@ -178,9 +164,9 @@ const extractChanges = (changes) => {
                     <div
                         class="w-full flex flex-col border-b-gray-200 dark:border-b-gray-500"
                         :class="{
-                            'py-2 border-b': index !== 0 && index !== saleOrderActionHistories.length - 1,
+                            'py-2 border-b': index !== 0 && index !== documentActionHistories.length - 1,
                             'pb-2 border-b': index === 0,
-                            'pt-2': index === saleOrderActionHistories.length - 1
+                            'pt-2': index === documentActionHistories.length - 1
                         }"
                     >
                         <div class="flex flex-col items-center pt-2 gap-1">

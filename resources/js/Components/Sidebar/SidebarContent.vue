@@ -48,7 +48,7 @@ const pendingBonusWithdrawal = ref(0);
     <PerfectScrollbar
         tagname="nav"
         aria-label="main"
-        class="relative flex flex-col flex-1 max-h-full gap-1 px-5 py-3 items-center"
+        class="relative w-full flex flex-col flex-1 max-w-full max-h-full gap-1 items-center "
     >
         <!-- Dashboard -->
         <SidebarLink
@@ -71,7 +71,43 @@ const pendingBonusWithdrawal = ref(0);
             </template>
 
             <SidebarCollapsibleItem
-                :title="$t('public.member')"
+                :title="$t('public.announcements')"
+                :href="route('crm.announcement.index')"
+                :active="route().current('crm.announcement.*')"
+            />
+
+            <SidebarCollapsibleItem
+                :title="$t('public.notifications')"
+                :href="route('crm.notification.index')"
+                :active="route().current('crm.notification.*')"
+            />
+
+            <SidebarCollapsibleItem
+                :title="$t('public.documents')"
+                :href="route('crm.document.index')"
+                :active="route().current('crm.document.*')"
+            />
+
+            <SidebarCollapsibleItem
+                :title="$t('public.internal_news')"
+                :href="route('crm.internalNews.index')"
+                :active="route().current('crm.internalNews.*')"
+            />
+
+            <SidebarCollapsibleItem
+                :title="$t('public.private_messages')"
+                :href="route('crm.privateMessage.index')"
+                :active="route().current('crm.privateMessage.*')"
+            />
+
+            <SidebarCollapsibleItem
+                :title="$t('public.account_manager_profiles')"
+                :href="route('crm.accountManager.index')"
+                :active="route().current('crm.accountManager.*')"
+            />
+
+            <SidebarCollapsibleItem
+                :title="$t('public.members')"
                 :href="route('crm.member.index')"
                 :active="route().current('crm.member.*')"
             />
@@ -94,6 +130,17 @@ const pendingBonusWithdrawal = ref(0);
                 :active="route().current('crm.lead.*')"
             />
 
+            <SidebarCollapsibleItem
+                :title="$t('public.payment_methods')"
+                :href="route('crm.paymentMethod.index')"
+                :active="route().current('crm.paymentMethod.*')"
+            />
+
+            <SidebarCollapsibleItem
+                :title="$t('public.payment_submissions')"
+                :href="route('crm.paymentSubmission.index')"
+                :active="route().current('crm.paymentSubmission.*')"
+            />
 
             <!-- <SidebarCollapsibleItem
                 :title="$t('public.withdrawal')"

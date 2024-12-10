@@ -39,7 +39,7 @@ onMounted(() => {
             transition-duration: 150ms;
         "
         :class="[
-            'fixed inset-y-0 z-20 bg-gray-25 dark:bg-gray-950 flex flex-col border-r border-gray-200 dark:border-gray-700',
+            'fixed inset-y-0 z-20 bg-gray-25 dark:bg-gray-950 flex flex-col border-r border-gray-200 dark:border-gray-700 lg:overflow-y-auto',
             {
                 'translate-x-0 w-[252px]':
                     sidebarState.isOpen || sidebarState.isHovered,
@@ -52,8 +52,13 @@ onMounted(() => {
     >
         <SidebarHeader />
 
-        <SidebarContent />
+        <div class="w-full flex flex-col h-full px-5 py-8 gap-8 bg-gray-25 dark:bg-gray-950 items-center overflow-y-auto no-scrollbar">
+        <!-- <SidebarHeader /> -->
 
-<!--        <SidebarFooter />-->
+            <div class="w-full h-full flex flex-col justify-center items-center overflow-y-auto no-scrollbar">
+                <SidebarContent />
+            </div>
+            <!-- <SidebarFooter /> -->
+        </div>
     </aside>
 </template>

@@ -31,28 +31,28 @@ dayjs.extend(timezone);
 const user = usePage().props.auth.user;
 
 const props = defineProps({
-    sale_order: Object,
+    lead_id: Number,
     isLoading: Boolean,
 })
 
-const saleOrderActionHistories = ref();
+const leadActionHistories = ref();
 const visible = ref(false)
 // const countries = ref(props.countries)
 const selectedCountry = ref();
 const { formatRgbaColor } = generalFormat();
 const { formatAmount } = transactionFormat();
 
-const getSaleOrderActionHistory = async () => {
+const getLeadLogEntries = async () => {
     try {
-        const response = await axios.get(`/crm/saleOrder/getSaleOrderLogEntries?id=` + props.sale_order.id);
+        const response = await axios.get(`/crm/lead/getLeadLogEntries?id=` + props.lead_id);
 
-        saleOrderActionHistories.value = response.data;
+        leadActionHistories.value = response.data;
     } catch (error) {
         console.error('Error get network:', error);
     }
 };
 
-getSaleOrderActionHistory();
+getLeadLogEntries();
 
 const openDialog = () => {
     visible.value = true
@@ -67,11 +67,11 @@ const form = useForm({
     phone_number: '',
 });
 
-// watch(() => props.SaleOrderNotes, (user) => {
-//     form.user_id = props.SaleOrderNotes.id
-//     form.name = props.SaleOrderNotes.name
-//     form.email = props.SaleOrderNotes.email
-//     form.phone = props.SaleOrderNotes.phone
+// watch(() => props.leadActionHistories, (user) => {
+//     form.user_id = props.leadActionHistories.id
+//     form.name = props.leadActionHistories.name
+//     form.email = props.leadActionHistories.email
+//     form.phone = props.leadActionHistories.phone
 
 //     // Set selectedCountry based on dial_code
 //     // selectedCountry.value = countries.value.find(country => country.phone_code === user.dial_code);
@@ -92,122 +92,80 @@ const submitForm = () => {
     });
 };
 
-const formatLogChanges = (value) => {
-    const pattern = /^(?:(?:19|20|21)\d{2})-(?:(?:0[1-9])|(?:1[0-2]))-(?:(?:0[1-9])|(?:[12][0-9])|(?:3[01]))\s(?:[01][0-9]|2[0-3]):(?:[0-5][0-9]):(?:[0-5][0-9])\.(?:\d{6})/;
-    
-    //Check if the value is a valid date format
-    if (pattern.test(value)) {
-        // Format the date value
-        return dayjs(value + '+00').tz(userTimezone).format('YYYY-MM-DD HH:mm:ss');
-    } else {
-        return value;
-    }
-}
-
-// Function to parse the changes string from a log entry
-const extractChanges = (changes) => {
-    let parsedChanges;
-    try {
-        parsedChanges = JSON.parse(changes);  // Parsing the changes JSON string into an object
-    } catch (error) {
-        console.error("Error parsing changes:", error);
-        return {}; // Return empty if there's an error parsing
-    }
-
-    const changeEntries = {};
-
-    // Loop through the parsed changes to extract key, old, and new values
-    Object.keys(parsedChanges).forEach(key => {
-        const [oldValue, newValue] = parsedChanges[key];  // Assuming the value is an array [oldValue, newValue]
-
-        // Only include changes where the old and new values differ
-        if (oldValue !== newValue) {
-            changeEntries[key] = { old: oldValue, new: newValue };
-        }
-    });
-
-    //   // Log the changeEntries for debugging purposes
-    //   console.log(changeEntries);
-
-    return changeEntries;  // Return an object with the keys, old, and new values
-};
-
 </script>
 
 <template>
-    <div class="w-full flex flex-col items-center p-3 gap-3 self-stretch rounded-lg bg-white dark:bg-gray-800 shadow-card md:px-6 md:py-5">
-        <div class="flex flex-col justify-center items-center gap-2 self-stretch">
-            <div class="flex justify-between items-start self-stretch">
-                <span class="w-full text-gray-950 dark:text-white font-bold text-xxl break-words">{{ $t('public.order_notes') }}</span>
-                <!-- <Button
-                    type="button"
-                    iconOnly
-                    size="base"
-                    variant="gray-text"
-                    pill
-                    @click="openDialog()"
-                    :disabled="!SaleOrderNotes"
-                >
-                    <IconPencilMinus size="20" />
-                </Button> -->
-            </div>
-        </div>
-        <div class="h-[1px] self-stretch bg-gray-200" />
-        <!-- Accordion to display order notes -->
-        <Accordion multiple class="w-full max-h-[600px] overflow-auto">
-            <div v-if="isLoading" class="animate-pulse flex flex-col items-start gap-1.5 self-stretch">
-                <div class="h-20 bg-gray-200 rounded-xl w-full my-2 md:my-3"></div>
-            </div>
-            <AccordionPanel
-                v-else
-                v-for="(note, index) in saleOrderActionHistories" 
-                :key="note.id" 
-                :value="index"
+    <div class="flex flex-col justify-center items-center gap-2 self-stretch">
+        <div class="flex justify-between items-start self-stretch">
+            <span class="w-full text-gray-950 dark:text-white font-bold text-xxl break-words">{{ $t('public.lead_history') }}</span>
+            <!-- <Button
+                type="button"
+                iconOnly
+                size="base"
+                variant="gray-text"
+                pill
+                @click="openDialog()"
+                :disabled="!leadActionHistories"
             >
-                <div class="w-full flex gap-2">
-                    <!-- dot on the top-left -->
-                    <div class="flex flex-col items-center">
-                        <div 
-                            class="w-3 h-3 rounded-full grow-0 shrink-0"
-                            :class="`bg-info-500`"
-                        >
-                        </div>
-                        <div class="w-0.5 h-full bg-gray-200 dark:bg-gray-500 "></div>
-                    </div>
-                    
-                    <div
-                        class="w-full flex flex-col border-b-gray-200 dark:border-b-gray-500"
-                        :class="{
-                            'py-2 border-b': index !== 0 && index !== saleOrderActionHistories.length - 1,
-                            'pb-2 border-b': index === 0,
-                            'pt-2': index === saleOrderActionHistories.length - 1
-                        }"
-                    >
-                        <div class="flex flex-col items-center pt-2 gap-1">
-                            <h3 class="self-stretch text-gray-950 dark:text-gray-100 font-semibold">{{ `[${$t('public.system')}]: ` + (note.action === 0 ? 'Newly created' : 'Updated') }}</h3>
-                            <span class="self-stretch text-sm text-gray-500 dark:text-gray-400">{{ note.created_at }}</span>
-                        </div>
-                        <AccordionHeader class="px-2 text-start">{{ `${$t('public.note_details')}&nbsp;(${note.id})` }}</AccordionHeader>
-                        <AccordionContent>
-                            <div class="w-full flex flex-col items-center p-2">
-                                <!-- Loop through all changes dynamically -->
-                                <div v-for="(change, key) in extractChanges(note.changes)" :key="key" class="w-full flex flex-col items-start justify-center gap-1">
-                                    <span class="text-gray-950 dark:text-gray-100">
-                                        ◉ [{{ $t('public.' + key) }}]
-                                    </span>
-
-                                    <span class="truncate text-gray-500 dark:text-gray-300 font-semibold ml-4">
-                                        <!-- Use dynamic translation with correct keys and values -->
-                                        ➤ {{ $t('public.change_message', { key: $t('public.' + key), old: `"${formatLogChanges(change.old)}"`, new: `"${formatLogChanges(change.new)}"`  }) }}
-                                    </span>
-                                </div>
-                            </div>
-                        </AccordionContent>
-                    </div>
-                </div>
-            </AccordionPanel>
-        </Accordion>
+                <IconPencilMinus size="20" />
+            </Button> -->
+        </div>
     </div>
+    <div class="h-[1px] self-stretch bg-gray-200" />
+    <!-- Accordion to display order notes -->
+    <Accordion multiple class="w-full h-full max-h-[900px] 2xl:max-h-[800px] overflow-auto">
+        <div v-if="isLoading" class="animate-pulse flex flex-col items-start gap-1.5 self-stretch">
+            <div class="h-20 bg-gray-200 rounded-xl w-full my-2 md:my-3"></div>
+        </div>
+        <AccordionPanel
+            v-else
+            v-for="(note, index) in leadActionHistories" 
+            :key="note.id" 
+            :value="index"
+        >
+            <div class="w-full flex gap-2">
+                <!-- dot on the top-left -->
+                <div class="flex flex-col items-center">
+                    <div 
+                        class="w-3 h-3 rounded-full grow-0 shrink-0"
+                        :class="`bg-info-500`"
+                    >
+                    </div>
+                    <div class="w-0.5 h-full bg-gray-200 dark:bg-gray-500 "></div>
+                </div>
+                
+                <div
+                    class="w-full flex flex-col border-b-gray-200 dark:border-b-gray-500"
+                    :class="{
+                        'py-2 border-b': index !== 0 && index !== leadActionHistories.length - 1,
+                        'pb-2 border-b': index === 0,
+                        'pt-2': index === leadActionHistories.length - 1
+                    }"
+                >
+                    <div class="flex flex-col items-center pt-2 gap-1">
+                        <h3 class="self-stretch text-gray-950 dark:text-gray-100 font-semibold">{{ `[${$t('public.system')}]: ` + (note.action === 0 ? 'Newly created' : 'Updated') }}</h3>
+                        <span class="self-stretch text-sm text-gray-500 dark:text-gray-400">{{ note.created_at }}</span>
+                    </div>
+                    <AccordionHeader class="px-2 text-start">{{ `${$t('public.note_details')}&nbsp;(${note.id})` }}</AccordionHeader>
+                    <AccordionContent>
+                        <div class="w-full flex flex-col items-center p-2">
+                            <!-- Loop through all changes dynamically -->
+                            <div v-for="(change, key) in extractChanges(note.changes)" :key="key" class="w-full flex flex-col items-start justify-center gap-1">
+                                <span class="text-gray-950 dark:text-gray-100">
+                                    ◉ [{{ $t('public.' + key) }}]
+                                </span>
+
+                                <span class="truncate text-gray-500 dark:text-gray-300 font-semibold ml-4">
+                                    <!-- Use dynamic translation with correct keys and values -->
+                                    ➤ {{ $t('public.change_message', { key: $t('public.' + key), old: `"${formatLogChanges(change.old)}"`, new: `"${formatLogChanges(change.new)}"`  }) }}
+                                </span>
+                            </div>
+                        </div>
+                    </AccordionContent>
+                </div>
+            </div>
+        </AccordionPanel>
+    </Accordion>
 
     <!-- edit contact info -->
     <Dialog

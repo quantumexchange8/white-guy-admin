@@ -158,57 +158,6 @@ watchEffect(() => {
     }
 });
 
-const exportXLSX = () => {
-    // Retrieve the array from the reactive proxy
-    const data = filteredValue.value;
-
-    // Specify the headers
-    const headers = [
-        trans('public.name'),
-        trans('public.email'),
-        trans('public.date'),
-        trans('public.account_type'),
-        trans('public.volume') + ' (Ł)',
-        trans('public.amount') + ' ($)'
-    ];
-
-    // Map the array data to XLSX rows
-    const rows = data.map(obj => {
-        return [
-            obj.name !== undefined ? obj.name : '',
-            obj.email !== undefined ? obj.email : '',
-            obj.execute_at !== undefined ? dayjs(obj.execute_at).format('YYYY/MM/DD') : '',
-            obj.account_type !== undefined ? trans('public.' + obj.account_type) : '',
-            obj.volume !== undefined ? obj.volume : '',
-            obj.rebate !== undefined ? obj.rebate : ''
-        ];
-    });
-
-    // Combine headers and rows into a single data array
-    const sheetData = [headers, ...rows];
-
-    // Create the XLSX content
-    let csvContent = "data:text/xlsx;charset=utf-8,";
-    
-    sheetData.forEach((rowArray) => {
-        const row = rowArray.join("\t"); // Use tabs for column separation
-        csvContent += row + "\r\n"; // Add a new line after each row
-    });
-
-    // Create a temporary link element
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", "export.xlsx");
-
-    // Append the link to the document and trigger the download
-    document.body.appendChild(link);
-    link.click();
-
-    // Clean up by removing the link
-    document.body.removeChild(link);
-};
-
 // dialog
 const data = ref({});
 const openDialog = (rowData) => {
@@ -326,10 +275,18 @@ const openDialog = (rowData) => {
                             </div>
                         </template>
                     </Column>
-                    <Column field="trade_id" :header="$t('public.trade_id')" sortable class="hidden md:table-cell w-full md:w-[15%] max-w-0">
+                    <Column field="trade_id" :header="$t('public.trade_id')" sortable class="w-3/4 md:w-[15%] max-w-0">
                         <template #body="slotProps">
-                            <div class="text-gray-950 dark:text-gray-100 text-sm truncate max-w-full">
+                            <div class="text-gray-950 dark:text-gray-100 text-sm truncate max-w-full hidden md:block">
                                 {{ slotProps.data.trade_id ? slotProps.data.trade_id : '-' }}
+                            </div>
+                            <div class="flex flex-col items-start max-w-full md:hidden">
+                                <div class="text-gray-950 dark:text-gray-100 font-semibold truncate max-w-full">
+                                    {{ slotProps.data.trade_id }}
+                                </div>
+                                <div class="text-gray-500 dark:text-gray-300 text-xs truncate max-w-full">
+                                    {{ slotProps.data.created_at }}
+                                </div>
                             </div>
                         </template>
                     </Column>
@@ -374,7 +331,7 @@ const openDialog = (rowData) => {
                     <span class="w-full truncate text-gray-500 dark:text-gray-300 text-sm">{{ data.user?.email }}</span>
                 </div>
                 <div class="flex flex-col w-full truncate">
-                    <span class="w-full truncate md:text-right text-xxl text-gray-950 dark:text-gray-100 font-bold">$&nbsp;{{ data.action_type === 'SELL' ? formatAmount(data.profit) : (data.action_type === 'BUY' ? formatAmount(data.unit_price * data.quantity) : '-') }}</span>
+                    <span class="w-full truncate md:text-right text-xl text-gray-950 dark:text-gray-100 font-bold">$&nbsp;{{ data.action_type === 'SELL' ? formatAmount(data.profit) : (data.action_type === 'BUY' ? formatAmount(data.unit_price * data.quantity) : '-') }}</span>
                 </div>
             </div>
             

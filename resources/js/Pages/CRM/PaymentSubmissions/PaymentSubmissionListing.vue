@@ -1,7 +1,7 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import { usePage } from "@inertiajs/vue3";
-import { IconCircleXFilled, IconSearch, IconDownload, IconFilterOff } from "@tabler/icons-vue";
+import { IconCircleXFilled, IconSearch, IconDownload, IconFilterOff, IconCopy } from "@tabler/icons-vue";
 import { ref, watch, watchEffect, onMounted } from "vue";
 import Loader from "@/Components/Loader.vue";
 import Dialog from "primevue/dialog";
@@ -19,7 +19,7 @@ import timezone from 'dayjs/plugin/timezone'
 import { trans, wTrans } from "laravel-vue-i18n";
 import DatePicker from 'primevue/datepicker';
 import debounce from "lodash/debounce.js";
-import MemberListingActions from "@/Pages/CRM/Member/Listings/Partials/MemberListingActions.vue";
+import PaymentSubmissionActions from "@/Pages/CRM/PaymentSubmissions/Partials/PaymentSubmissionActions.vue";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -31,7 +31,7 @@ const user = usePage().props.auth.user;
 const visible = ref(false);
 const loading = ref(false);
 const dt = ref(null);
-const members = ref([]);
+const paymentSubmissions = ref([]);
 const totalRecords = ref(0);
 const rows = ref(10);
 const page = ref(0);
@@ -56,7 +56,7 @@ const getResults = async () => {
     loading.value = true;
     try {
         // Define the base URL
-        let url = `/crm/member/getMembers?rows=${rows.value}&page=${page.value}`;
+        let url = `/crm/paymentSubmission/getPaymentSubmissions?rows=${rows.value}&page=${page.value}`;
 
         if (filters.value.global) {
             url += `&search=${filters.value.global}`;
@@ -70,11 +70,11 @@ const getResults = async () => {
         const response = await axios.get(url);
         
         // Update the data and total records with the response
-        members.value = response.data.data;
+        paymentSubmissions.value = response.data.data;
         totalRecords.value = response.data.totalRecords;
     } catch (error) {
         console.error('Error fetching leads data:', error);
-        members.value = [];
+        paymentSubmissions.value = [];
     } finally {
         loading.value = false;
     }
@@ -117,15 +117,40 @@ const openDialog = (rowData) => {
     visible.value = true;
     data.value = rowData;
 };
+
+const tooltipText = ref('copy');
+const copyToClipboard = (text) => {
+    const textToCopy = text;
+
+    const textArea = document.createElement('textarea');
+    document.body.appendChild(textArea);
+
+    textArea.value = textToCopy;
+    textArea.select();
+
+    try {
+        const successful = document.execCommand('copy');
+
+        tooltipText.value = 'copied';
+        setTimeout(() => {
+            tooltipText.value = 'copy';
+        }, 1500);
+    } catch (err) {
+        console.error('Copy to clipboard failed:', err);
+    }
+
+    document.body.removeChild(textArea);
+}
+
 </script>
 
 <template>
-    <AuthenticatedLayout :title="`${$t('public.member_listing')}`">
+    <AuthenticatedLayout :title="`${$t('public.payment_submissions')}`">
         <div class="flex flex-col justify-center items-center px-3 py-5 self-stretch rounded-lg bg-white dark:bg-gray-900 shadow-card md:p-6 md:gap-6">
             <div class="flex flex-col pb-3 gap-3 items-center self-stretch md:flex-row md:gap-0 md:justify-between md:pb-0">
-                <span class="text-gray-950 dark:text-gray-100 font-semibold self-stretch md:self-auto">{{ $t('public.member_listing') }}</span>
+                <span class="text-gray-950 dark:text-gray-100 font-semibold self-stretch md:self-auto">{{ $t('public.payment_submissions') }}</span>
                 <div class="flex flex-col gap-3 items-center self-stretch md:flex-row md:gap-5">
-                    <Button variant="primary-outlined" @click="exportXLSX()" :disabled="members.length <= 0" class="w-full md:w-auto">
+                    <Button variant="primary-outlined" @click="exportXLSX()" :disabled="paymentSubmissions.length <= 0" class="w-full md:w-auto">
                         <IconDownload size="20" stroke-width="1.25" />
                         {{ $t('public.export') }}
                     </Button>
@@ -134,7 +159,7 @@ const openDialog = (rowData) => {
             <DataTable
                 ref="dt"
                 :loading="loading"
-                :value="members"
+                :value="paymentSubmissions"
                 lazy
                 removableSort
                 :paginator="true"
@@ -200,51 +225,51 @@ const openDialog = (rowData) => {
                         <span class="text-sm text-gray-700 dark:text-gray-300">{{ $t('public.loading') }}</span>
                     </div>
                 </template>
-                <template v-if="members?.length > 0">
-                    <Column field="username" sortable :header="$t('public.name')" class="w-3/4 md:w-[20%] max-w-0 px-3">
+                <template v-if="paymentSubmissions?.length > 0">
+                    <Column field="created_at" :header="`${$t('public.date')}`" class="hidden md:table-cell w-[20%] max-w-0">
+                        <template #body="slotProps">
+                            <div class="text-gray-950 dark:text-gray-100 text-sm">
+                                {{ slotProps.data.created_at }}
+                            </div>
+                        </template>
+                    </Column>
+                    <Column field="name" :header="$t('public.name')" class="w-3/4 md:w-[20%] max-w-0 px-3">
                         <template #body="slotProps">
                             <div class="flex flex-col items-start max-w-full">
                                 <div class="text-gray-950 dark:text-gray-100 font-semibold truncate max-w-full">
-                                    {{ slotProps.data.username }}
+                                    {{ slotProps.data?.user?.full_name ? slotProps.data?.user?.full_name : '-' }}
                                 </div>
                                 <div class="text-gray-500 dark:text-gray-300 text-xs truncate max-w-full">
-                                    {{ slotProps.data.email }}
+                                    {{ slotProps.data?.user?.email ? slotProps.data?.user?.email : '-' }}
                                 </div>
                             </div>
                         </template>
                     </Column>
-                    <Column field="full_name" sortable :header="`${$t('public.full_name')} (${$t('public.site')})`" class="hidden md:table-cell w-[15%] max-w-0">
+                    <Column field="status" :header="`${$t('public.status')}`" class="hidden md:table-cell w-[15%] max-w-0">
                         <template #body="slotProps">
                             <div class="text-gray-950 dark:text-gray-100 text-sm">
-                                {{ slotProps.data.full_name ? slotProps.data.full_name : '-' }}{{ slotProps.data.site?.name ? ` (${slotProps.data.site.name})` : '' }}
+                                {{ slotProps.data.status ? slotProps.data.status : '-' }}
                             </div>
                         </template>
                     </Column>
-                    <Column field="account_id" :header="$t('public.account_id')" sortable class="hidden md:table-cell w-full md:w-[15%] max-w-0">
-                        <template #body="slotProps">
-                            <div class="text-gray-950 dark:text-gray-100 text-sm truncate max-w-full">
-                                {{ slotProps.data.account_id ? slotProps.data.account_id : '-' }}
-                            </div>
-                        </template>
-                    </Column>
-                    <Column field="rank" :header="`${$t('public.rank')}`" class="hidden md:table-cell w-[20%] max-w-0">
+                    <Column field="payment_method" :header="`${$t('public.payment_method')}`" class="hidden md:table-cell w-[15%] max-w-0">
                         <template #body="slotProps">
                             <div class="text-gray-950 dark:text-gray-100 text-sm">
-                                {{ slotProps.data.rank ? slotProps.data.rank : '-' }}
+                                {{ slotProps.data?.payment_method?.title ? slotProps.data?.payment_method?.title : '-' }}
                             </div>
                         </template>
                     </Column>
-                    <Column field="account_manager" :header="`${$t('public.account_manager')}`" class="hidden md:table-cell w-[20%] max-w-0">
+                    <Column field="converted_amount" :header="`${$t('public.amount')}`" class="hidden md:table-cell w-[15%] max-w-0">
                         <template #body="slotProps">
                             <div class="text-gray-950 dark:text-gray-100 text-sm">
-                                {{ slotProps.data.account_manager?.username || '-' }}{{ slotProps.data.account_manager?.site?.name ? ` (${slotProps.data.account_manager.site.name})` : '' }}
+                                {{ slotProps.data?.converted_amount ? formatAmount(slotProps.data?.converted_amount) : formatAmount(0) }}
                             </div>
                         </template>
                     </Column>
-                    <Column field="action" :header="`${$t('public.action')}`" class="w-1/4 md:w-[10%] max-w-0 px-3">
+                    <Column field="action" :header="`${$t('public.action')}`" class="w-1/4 md:w-[15%] max-w-0 px-3">
                         <template #body="slotProps">
-                            <MemberListingActions 
-                                :member="slotProps.data"
+                            <PaymentSubmissionActions 
+                                :payment_submission="slotProps.data"
                             />
                         </template>
                     </Column>
@@ -253,50 +278,57 @@ const openDialog = (rowData) => {
         </div>
     </AuthenticatedLayout>
 
-    <Dialog v-model:visible="visible" modal :header="$t('public.member_details')" class="dialog-xs md:dialog-md">
+    <Dialog v-model:visible="visible" modal :header="$t('public.payment_submission_details')" class="dialog-xs md:dialog-md">
         <div class="flex flex-col justify-center items-center gap-3 self-stretch pt-4 md:pt-6">
-            <div class="flex flex-col justify-between items-center p-3 gap-3 self-stretch bg-gray-50 dark:bg-gray-700 md:flex-row">
+            <div class="flex flex-col-reverse justify-between items-center p-3 gap-1 self-stretch bg-gray-50 dark:bg-gray-700 md:flex-row">
                 <div class="flex flex-col items-start w-full truncate">
-                    <span class="w-full truncate text-gray-950 dark:text-gray-100 font-semibold">{{ data.full_name }} {{ data.site?.name ? ` (${data.site.name})` : '' }}</span>
-                    <span class="w-full truncate text-gray-500 dark:text-gray-300 text-sm">{{ data.email }}</span>
+                    <span class="w-full truncate text-gray-950 dark:text-gray-100 font-semibold">{{ data?.user?.full_name }}</span>
+                    <span class="w-full truncate text-gray-500 dark:text-gray-300 text-sm">{{ data?.user?.email }}</span>
                 </div>
-            </div>
-            
-            <div class="flex flex-col items-center p-3 gap-3 self-stretch bg-gray-50 dark:bg-gray-700">
-                <div class="w-full flex flex-col items-start gap-1 md:flex-row">
-                    <span class="w-full max-w-[200px] truncate text-gray-500 dark:text-gray-300 text-sm">{{ $t('public.phone_number') }}</span>
-                    <span class="w-full truncate text-gray-950 dark:text-gray-100 text-sm font-medium">{{ data.phone_number ?? '-' }}</span>
-                </div>
-                <div class="w-full flex flex-col items-start gap-1 md:flex-row">
-                    <span class="w-full max-w-[200px] truncate text-gray-500 dark:text-gray-300 text-sm">{{ $t('public.country') }}</span>
-                    <span class="w-full truncate text-gray-950 dark:text-gray-100 text-sm font-medium">{{ data.country !== '' ? data.country : '-' }}</span>
-                </div>
-                <div class="w-full flex flex-col items-start gap-1 md:flex-row">
-                    <span class="w-full max-w-[200px] truncate text-gray-500 dark:text-gray-300 text-sm">{{ $t('public.address') }}</span>
-                    <span class="w-full break-all text-gray-950 dark:text-gray-100 text-sm font-medium">{{ data.address !== '' ? data.address : '-' }}</span>
+                <div class="flex flex-col w-full truncate">
+                    <span class="w-full truncate md:text-right text-xl text-gray-950 dark:text-gray-100 font-bold">$&nbsp;{{ formatAmount(data?.converted_amount) }}</span>
                 </div>
             </div>
 
             <div class="flex flex-col items-center p-3 gap-3 self-stretch bg-gray-50 dark:bg-gray-700">
                 <div class="w-full flex flex-col items-start gap-1 md:flex-row">
-                    <span class="w-full max-w-[200px] truncate text-gray-500 dark:text-gray-300 text-sm">{{ $t('public.account_type') }}</span>
-                    <span class="w-full truncate text-gray-950 dark:text-gray-100 text-sm font-medium">{{ data.account_type !== '' ? data.account_type : '-' }}</span>
+                    <span class="w-full max-w-[200px] truncate text-gray-500 dark:text-gray-300 text-sm">{{ $t('public.date') }}</span>
+                    <span class="w-full truncate text-gray-950 dark:text-gray-100 text-sm font-medium">{{ data?.created_at ? data?.created_at : '-' }}</span>
                 </div>
                 <div class="w-full flex flex-col items-start gap-1 md:flex-row">
-                    <span class="w-full max-w-[200px] truncate text-gray-500 dark:text-gray-300 text-sm">{{ $t('public.account_holder') }}</span>
-                    <span class="w-full truncate text-gray-950 dark:text-gray-100 text-sm font-medium">{{ data.account_holder !== '' ? data.account_holder : '-' }}</span>
+                    <span class="w-full max-w-[200px] truncate text-gray-500 dark:text-gray-300 text-sm">{{ $t('public.payment_method') }}</span>
+                    <span class="w-full truncate text-gray-950 dark:text-gray-100 text-sm font-medium">{{ data?.payment_method?.title ? data?.payment_method?.title : '-' }}</span>
                 </div>
                 <div class="w-full flex flex-col items-start gap-1 md:flex-row">
-                    <span class="w-full max-w-[200px] truncate text-gray-500 dark:text-gray-300 text-sm">{{ $t('public.customer_type') }}</span>
-                    <span class="w-full truncate text-gray-950 dark:text-gray-100 text-sm font-medium">{{ data.customer_type !== '' ? data.customer_type : '-' }}</span>
+                    <span class="w-full max-w-[200px] truncate text-gray-500 dark:text-gray-300 text-sm">{{ $t('public.status') }}</span>
+                    <span class="w-full truncate text-gray-950 dark:text-gray-100 text-sm font-medium">{{ data?.status ? data?.status : '-' }}</span>
                 </div>
                 <div class="w-full flex flex-col items-start gap-1 md:flex-row">
-                    <span class="w-full max-w-[200px] truncate text-gray-500 dark:text-gray-300 text-sm">{{ $t('public.lead_status') }}</span>
-                    <span class="w-full truncate text-gray-950 dark:text-gray-100 text-sm font-medium">{{ data.lead_status !== '' ? data.lead_status : '-' }}</span>
+                    <span class="w-full max-w-[200px] truncate text-gray-500 dark:text-gray-300 text-sm">{{ $t('public.approved_at') }}</span>
+                    <span class="w-full truncate text-gray-950 dark:text-gray-100 text-sm font-medium">{{ data?.approved_at ? data?.approved_at : '-' }}</span>
                 </div>
                 <div class="w-full flex flex-col items-start gap-1 md:flex-row">
-                    <span class="w-full max-w-[200px] truncate text-gray-500 dark:text-gray-300 text-sm">{{ $t('public.client_stage') }}</span>
-                    <span class="w-full truncate text-gray-950 dark:text-gray-100 text-sm font-medium">{{ data.client_stage !== '' ? data.client_stage : '-' }}</span>
+                    <span class="w-full max-w-[200px] truncate text-gray-500 dark:text-gray-300 text-sm">{{ $t('public.amount') }}</span>
+                    <span class="w-full truncate text-gray-950 dark:text-gray-100 text-sm font-medium">$ {{ data?.amount ? data?.amount : '-' }}</span>
+                </div>
+                <div class="w-full flex flex-col items-start gap-1 md:flex-row">
+                    <span class="w-full max-w-[200px] truncate text-gray-500 dark:text-gray-300 text-sm">{{ $t('public.converted_amount') }}</span>
+                    <span class="w-full truncate text-gray-950 dark:text-gray-100 text-sm font-medium">$ {{ data?.converted_amount ? data?.converted_amount : '-' }}</span>
+                </div>
+            </div>
+            
+            <div class="flex flex-col items-center p-3 gap-3 self-stretch bg-gray-50 dark:bg-gray-700">
+                <div class="w-full flex flex-col items-start gap-1 md:flex-row">
+                    <span class="w-full max-w-[200px] truncate text-gray-500 dark:text-gray-300 text-sm">{{ $t('public.user_memo') }}</span>
+                    <span class="w-full truncate text-gray-950 dark:text-gray-100 text-sm font-medium">{{ data?.user_memo ? data?.user_memo : '-' }}</span>
+                </div>
+                <div class="w-full flex flex-col items-start gap-1 md:flex-row">
+                    <span class="w-full max-w-[200px] truncate text-gray-500 dark:text-gray-300 text-sm">{{ $t('public.admin_memo') }}</span>
+                    <span class="w-full truncate text-gray-950 dark:text-gray-100 text-sm font-medium">{{ data?.admin_memo ? data?.admin_memo : '-' }}</span>
+                </div>
+                <div class="w-full flex flex-col items-start gap-1 md:flex-row">
+                    <span class="w-full max-w-[200px] truncate text-gray-500 dark:text-gray-300 text-sm">{{ $t('public.admin_remark') }}</span>
+                    <span class="w-full truncate text-gray-950 dark:text-gray-100 text-sm font-medium">{{ data?.admin_remark ? data?.admin_remark : '-' }}</span>
                 </div>
             </div>
         </div>

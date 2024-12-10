@@ -39,17 +39,22 @@ class SaleOrderController extends Controller
         if ($search) {
             $query->where(function ($query) use ($search) {
                 // Search in the current model's fields
-                // $query->where('trade_id', 'like', '%' . $search . '%');
+                $query->where('registered_name', 'like', '%' . $search . '%')
+                    ->orWhere('email', 'like', '%' . $search . '%');
                 
                 // Search in the related 'user' fields
                 $query->orWhereHas('creator', function ($userQuery) use ($search) {
-                    $userQuery->where('full_name', 'like', '%' . $search . '%')
-                        ->orWhere('username', 'like', '%' . $search . '%')
+                    $userQuery->where('username', 'like', '%' . $search . '%')
                         ->orWhere('email', 'like', '%' . $search . '%');
                 });
 
                 // Search in the related 'user.site' fields
                 $query->orWhereHas('creator.site', function ($siteQuery) use ($search) {
+                    $siteQuery->where('name', 'like', '%' . $search . '%');
+                });
+
+                // Search in the related 'user.site' fields
+                $query->orWhereHas('site', function ($siteQuery) use ($search) {
                     $siteQuery->where('name', 'like', '%' . $search . '%');
                 });
             });

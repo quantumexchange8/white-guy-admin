@@ -192,16 +192,23 @@ class LeadController extends Controller
         return response()->json(Lead::find($id)->leadfront);
     }
 
-    // public function getLeadChangelogs(string $id)
-    // {
-    //     $existingLeadChangelogs = LeadChangelog::where('lead_id', $id)
-    //                                             ->orderBy('created_at', 'desc')
-    //                                             ->get()
-    //                                             ->map(function ($changelog) {
-    //                                                 $changelog['source'] = 'lead_changelog';
-    //                                                 return $changelog;
-    //                                             });
-    //     return response()->json($existingLeadChangelogs);
-    // }
+    public function getLeadLogEntries(Request $request)
+    {
+        $contentTypeId = ContentType::with('auditLogEntries')
+                                        ->where('app_label', 'core')
+                                        ->where('model', 'lead')
+                                        ->select('id')
+                                        ->get();
+
+        $leadLogEntries = [];
+
+        foreach ($contentTypeId[0]->auditLogEntries as $key => $value) {
+            if ((string)$value->object_id === $request->id){
+                array_push($leadLogEntries, $value);
+            }
+        }
+
+        return response()->json($leadLogEntries);
+    }
 
 }

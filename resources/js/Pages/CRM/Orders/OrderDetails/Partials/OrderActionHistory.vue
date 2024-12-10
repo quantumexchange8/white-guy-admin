@@ -35,24 +35,24 @@ const props = defineProps({
     isLoading: Boolean,
 })
 
-const orderNotes = ref();
+const orderActionHistories = ref();
 const visible = ref(false)
 // const countries = ref(props.countries)
 const selectedCountry = ref();
 const { formatRgbaColor } = generalFormat();
 const { formatAmount } = transactionFormat();
 
-const getorderNotes = async () => {
+const getorderActionHistory = async () => {
     try {
         const response = await axios.get(`/crm/order/getOrderLogEntries?id=` + props.order.id);
 
-        orderNotes.value = response.data;
+        orderActionHistories.value = response.data;
     } catch (error) {
         console.error('Error get network:', error);
     }
 };
 
-getorderNotes();
+getorderActionHistory();
 
 const openDialog = () => {
     visible.value = true
@@ -67,11 +67,11 @@ const form = useForm({
     phone_number: '',
 });
 
-// watch(() => props.orderNotes, (user) => {
-//     form.user_id = props.orderNotes.id
-//     form.name = props.orderNotes.name
-//     form.email = props.orderNotes.email
-//     form.phone = props.orderNotes.phone
+// watch(() => props.orderActionHistories, (user) => {
+//     form.user_id = props.orderActionHistories.id
+//     form.name = props.orderActionHistories.name
+//     form.email = props.orderActionHistories.email
+//     form.phone = props.orderActionHistories.phone
 
 //     // Set selectedCountry based on dial_code
 //     // selectedCountry.value = countries.value.find(country => country.phone_code === user.dial_code);
@@ -146,7 +146,7 @@ const extractChanges = (changes) => {
                     variant="gray-text"
                     pill
                     @click="openDialog()"
-                    :disabled="!orderNotes"
+                    :disabled="!orderActionHistories"
                 >
                     <IconPencilMinus size="20" />
                 </Button> -->
@@ -160,7 +160,7 @@ const extractChanges = (changes) => {
             </div>
             <AccordionPanel
                 v-else
-                v-for="(note, index) in orderNotes" 
+                v-for="(note, index) in orderActionHistories" 
                 :key="note.id" 
                 :value="index"
             >
@@ -178,9 +178,9 @@ const extractChanges = (changes) => {
                     <div
                         class="w-full flex flex-col border-b-gray-200 dark:border-b-gray-500"
                         :class="{
-                            'py-2 border-b': index !== 0 && index !== orderNotes.length - 1,
+                            'py-2 border-b': index !== 0 && index !== orderActionHistories.length - 1,
                             'pb-2 border-b': index === 0,
-                            'pt-2': index === orderNotes.length - 1
+                            'pt-2': index === orderActionHistories.length - 1
                         }"
                     >
                         <div class="flex flex-col items-center pt-2 gap-1">

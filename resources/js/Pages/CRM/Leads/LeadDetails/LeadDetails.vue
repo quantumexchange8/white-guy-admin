@@ -1,12 +1,19 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { usePage, useForm } from "@inertiajs/vue3";
-import { ref, watchEffect } from "vue";
+import { h, ref, watch, watchEffect } from "vue";
 import { IconChevronRight } from '@tabler/icons-vue';
 import Button from '@/Components/Button.vue';
+import Tabs from 'primevue/tabs';
+import TabList from 'primevue/tablist';
+import Tab from 'primevue/tab';
+import TabPanels from 'primevue/tabpanels';
+import TabPanel from 'primevue/tabpanel';
+import { wTrans } from "laravel-vue-i18n";
 import LeadDetailInfo from '@/Pages/CRM/Leads/LeadDetails/Partials/LeadDetailInfo.vue';
 import LeadFrontInfo from '@/Pages/CRM/Leads/LeadDetails/Partials/LeadFrontInfo.vue';
 import LeadNotes from '@/Pages/CRM/Leads/LeadDetails/Partials/LeadNotes.vue';
+import LeadActionHistory from '@/Pages/CRM/Leads/LeadDetails/Partials/LeadActionHistory.vue';
 
 const user = usePage().props.auth.user;
 
@@ -39,6 +46,35 @@ watchEffect(() => {
         getUserData();
     }
 });
+
+const tabs = ref([
+    {   
+        title: wTrans('lead_notes'),
+        type: 'lead_notes',
+        component: h(LeadNotes),
+    },
+    {   
+        title: wTrans('lead_history'),
+        type: 'lead_history',
+        component: h(LeadActionHistory),
+    },
+]);
+
+const selectedType = ref('lead_notes');
+const activeIndex = ref(tabs.value.findIndex(tab => tab.type === selectedType.value));
+
+// Watch for changes in selectedType and update the activeIndex accordingly
+watch(selectedType, (newType) => {
+    const index = tabs.value.findIndex(tab => tab.type === newType);
+    if (index >= 0) {
+        activeIndex.value = index;
+    }
+});
+
+function updateType(event) {
+    const selectedTab = tabs.value[event.index];
+    selectedType.value = selectedTab.type;
+}
 
 </script>
 
@@ -75,10 +111,32 @@ watchEffect(() => {
                     />
                 </div>
                 <div class="w-full grid col-span-1">
-                    <LeadNotes
-                        :lead_id="props.lead.id"
-                        :isLoading="isLoading"
-                    />
+                    <div class="w-full flex flex-col items-center p-3 gap-3 self-stretch rounded-lg bg-white dark:bg-gray-800 shadow-card md:px-6 md:py-5">
+                        <Tabs v-model:value="activeIndex" class="w-full" @tab-change="updateType" >
+                            <TabList>
+                                <Tab 
+                                    v-for="(tab, index) in tabs" 
+                                    :key="tab.title"
+                                    :value="index"
+                                >
+                                    {{ tab.title }}
+                                </Tab>
+                            </TabList>
+                        </Tabs>
+
+                        <component 
+                            v-if="tabs[activeIndex].component"
+                            :is="tabs[activeIndex].component" 
+                            key="tabs[activeIndex].type" 
+                            :lead_id="props.lead.id"
+                            :isLoading="isLoading"
+                        />
+
+                        <!-- <LeadNotes
+                            :lead_id="props.lead.id"
+                            :isLoading="isLoading"
+                        /> -->
+                    </div>
                 </div>
             </div>
         </div>
