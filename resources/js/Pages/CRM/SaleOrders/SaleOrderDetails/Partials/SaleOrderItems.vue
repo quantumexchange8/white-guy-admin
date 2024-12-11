@@ -146,7 +146,7 @@ const openDialog = (rowData) => {
             scrollHeight="500px"
             @row-click="(event) => openDialog(event.data)"
         >
-            <template #header>
+            <!-- <template #header>
                 <div class="flex flex-col justify-between items-center pb-5 gap-3 self-stretch md:flex-row">
                     <div class="flex flex-col items-center gap-3 self-stretch md:flex-row">
                         <div class="relative w-full md:w-60">
@@ -183,7 +183,7 @@ const openDialog = (rowData) => {
                             </div>
                         </div>
 
-                        <!-- <Select
+                        <Select
                             v-model="filters['account_type'].value"
                             :options="accountTypeOption"
                             optionLabel="name"
@@ -191,7 +191,7 @@ const openDialog = (rowData) => {
                             :placeholder="$t('public.filter_by_account_type')"
                             class="w-full md:w-60 font-normal"
                             scroll-height="236px"
-                        /> -->
+                        />
                     </div>
                     <Button
                         type="button"
@@ -204,13 +204,9 @@ const openDialog = (rowData) => {
                         {{ $t('public.clear') }}
                     </Button>
                 </div>
-            </template>
+            </template> -->
             <template #empty>
-                <Empty :message="$t('public.no_history_yet')">
-                    <template #image>
-                        <div class="w-60 h-[100px]"></div>
-                    </template>
-                </Empty>
+                <Empty :message="$t('public.no_history_yet')" />
             </template>
             <template #loading>
                 <div class="flex flex-col gap-2 items-center justify-center">
@@ -218,76 +214,78 @@ const openDialog = (rowData) => {
                     <span class="text-sm text-gray-700">{{ $t('public.loading') }}</span>
                 </div>
             </template>
-            <Column field="created_at" sortable style="width: 20%" headerClass="hidden md:table-cell" class="hidden md:table-cell">
-                <template #header>
-                    <span class="hidden md:block">{{ $t('public.date') }}</span>
-                </template>
-                <template #body="slotProps">
-                    <div class="text-gray-950 dark:text-gray-100 text-sm">
-                        {{ dayjs(slotProps.data.created_at).format('YYYY/MM/DD') }}
-                    </div>
-                </template>
-            </Column>
-            <Column field="public_id" style="width: 15%" headerClass="hidden md:table-cell" class="hidden md:table-cell">
-                <template #header>
-                    <span class="hidden md:block">{{ $t('public.public_id') }}</span>
-                </template>
-                <template #body="slotProps">
-                    <div class="text-gray-950 dark:text-gray-100 text-sm">
-                        {{ slotProps.data.public_id }}
-                    </div>
-                </template>
-            </Column>
-            <Column field="order_type" style="width: 15%" headerClass="hidden md:table-cell" class="hidden md:table-cell">
-                <template #header>
-                    <span class="hidden md:block">{{ $t('public.order_type') }}</span>
-                </template>
-                <template #body="slotProps">
-                    <div class="text-gray-950 dark:text-gray-100 text-sm">
-                        {{ slotProps.data.order_type }}
-                    </div>
-                </template>
-            </Column>
-            <Column field="product" style="width: 15%" headerClass="hidden md:table-cell" class="hidden md:table-cell">
-                <template #header>
-                    <span class="hidden md:block">{{ $t('public.product') }}</span>
-                </template>
-                <template #body="slotProps">
-                    <div class="text-gray-950 dark:text-gray-100 text-sm">
-                        {{ slotProps.data.product }}
-                    </div>
-                </template>
-            </Column>
-            <Column field="total_price" sortable style="width: 15%" headerClass="hidden md:table-cell" class="hidden md:table-cell">
-                <template #header>
-                    <span class="hidden md:block">{{ `${$t('public.amount')} ($)` }}</span>
-                </template>
-                <template #body="slotProps">
-                    {{ formatAmount(slotProps.data.total_price) }}
-                </template>
-            </Column>
-            <Column field="completed_at" style="width: 20%" headerClass="hidden md:table-cell" class="hidden md:table-cell">
-                <template #header>
-                    <span class="hidden md:block">{{ $t('public.completed_at') }}</span>
-                </template>
-                <template #body="slotProps">
-                    {{ $t(`${slotProps.data?.completed_at || '-' }`) }}
-                </template>
-            </Column>
-            <Column field="created_at" headerClass="hidden" class="md:hidden">
-                <template #body="slotProps">
-                    <div class="w-full grid grid-cols-2">
-                        <div class="flex flex-col items-start justify-center gap-1">
-                            <span class="w-full truncate text-gray-950 dark:text-gray-100 text-sm font-bold">{{ dayjs(slotProps.data.created_at).format('YYYY/MM/DD') }}</span>
-                            <span class="w-full truncate text-gray-500 dark:text-gray-300 text-sm font-medium">{{ $t('public.order_type') }}:&nbsp;{{ slotProps.data.order_type }}</span>
+            <template v-if="items?.length > 0">
+                <Column field="created_at" sortable style="width: 20%" headerClass="hidden md:table-cell" class="hidden md:table-cell">
+                    <template #header>
+                        <span class="hidden md:block">{{ $t('public.date') }}</span>
+                    </template>
+                    <template #body="slotProps">
+                        <div class="text-gray-950 dark:text-gray-100 text-sm">
+                            {{ dayjs(slotProps.data.created_at).format('YYYY/MM/DD') }}
                         </div>
-                        <div class="flex flex-col items-start justify-center gap-1">
-                            <span class="w-full truncate text-right text-gray-950 dark:text-gray-100 text-sm font-bold">$&nbsp;{{ slotProps.data.total_price }}</span>
-                            <span class="w-full truncate text-right text-gray-500 dark:text-gray-300 text-sm font-medium">{{ $t('public.completed_at') }}:&nbsp;{{ slotProps.data?.completed_at || '-' }}</span>
+                    </template>
+                </Column>
+                <Column field="public_id" style="width: 15%" headerClass="hidden md:table-cell" class="hidden md:table-cell">
+                    <template #header>
+                        <span class="hidden md:block">{{ $t('public.public_id') }}</span>
+                    </template>
+                    <template #body="slotProps">
+                        <div class="text-gray-950 dark:text-gray-100 text-sm">
+                            {{ slotProps.data.public_id }}
                         </div>
-                    </div>
-                </template>
-            </Column>
+                    </template>
+                </Column>
+                <Column field="order_type" style="width: 15%" headerClass="hidden md:table-cell" class="hidden md:table-cell">
+                    <template #header>
+                        <span class="hidden md:block">{{ $t('public.order_type') }}</span>
+                    </template>
+                    <template #body="slotProps">
+                        <div class="text-gray-950 dark:text-gray-100 text-sm">
+                            {{ slotProps.data.order_type }}
+                        </div>
+                    </template>
+                </Column>
+                <Column field="product" style="width: 15%" headerClass="hidden md:table-cell" class="hidden md:table-cell">
+                    <template #header>
+                        <span class="hidden md:block">{{ $t('public.product') }}</span>
+                    </template>
+                    <template #body="slotProps">
+                        <div class="text-gray-950 dark:text-gray-100 text-sm">
+                            {{ slotProps.data.product }}
+                        </div>
+                    </template>
+                </Column>
+                <Column field="total_price" sortable style="width: 15%" headerClass="hidden md:table-cell" class="hidden md:table-cell">
+                    <template #header>
+                        <span class="hidden md:block">{{ `${$t('public.amount')} ($)` }}</span>
+                    </template>
+                    <template #body="slotProps">
+                        {{ formatAmount(slotProps.data.total_price) }}
+                    </template>
+                </Column>
+                <Column field="completed_at" style="width: 20%" headerClass="hidden md:table-cell" class="hidden md:table-cell">
+                    <template #header>
+                        <span class="hidden md:block">{{ $t('public.completed_at') }}</span>
+                    </template>
+                    <template #body="slotProps">
+                        {{ $t(`${slotProps.data?.completed_at || '-' }`) }}
+                    </template>
+                </Column>
+                <Column field="created_at" headerClass="hidden" class="md:hidden">
+                    <template #body="slotProps">
+                        <div class="w-full grid grid-cols-2">
+                            <div class="flex flex-col items-start justify-center gap-1">
+                                <span class="w-full truncate text-gray-950 dark:text-gray-100 text-sm font-bold">{{ dayjs(slotProps.data.created_at).format('YYYY/MM/DD') }}</span>
+                                <span class="w-full truncate text-gray-500 dark:text-gray-300 text-sm font-medium">{{ $t('public.order_type') }}:&nbsp;{{ slotProps.data.order_type }}</span>
+                            </div>
+                            <div class="flex flex-col items-start justify-center gap-1">
+                                <span class="w-full truncate text-right text-gray-950 dark:text-gray-100 text-sm font-bold">$&nbsp;{{ slotProps.data.total_price }}</span>
+                                <span class="w-full truncate text-right text-gray-500 dark:text-gray-300 text-sm font-medium">{{ $t('public.completed_at') }}:&nbsp;{{ slotProps.data?.completed_at || '-' }}</span>
+                            </div>
+                        </div>
+                    </template>
+                </Column>
+            </template>
         </DataTable>
     </div>
 

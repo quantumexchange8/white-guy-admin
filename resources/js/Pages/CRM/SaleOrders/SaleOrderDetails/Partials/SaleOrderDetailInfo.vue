@@ -112,19 +112,23 @@ const tabs = ref([
 const selectedType = ref('sale_order_details');
 const activeIndex = ref(tabs.value.findIndex(tab => tab.type === selectedType.value));
 
-// Watch for changes in selectedType and update the activeIndex accordingly
+// Sync selectedType to activeIndex
 watch(selectedType, (newType) => {
+    // console.log('Selected type changed:', newType);
     const index = tabs.value.findIndex(tab => tab.type === newType);
+    // console.log('Found index:', index);
     if (index >= 0) {
         activeIndex.value = index;
-        getResults();
     }
 });
 
-function updateType(event) {
-    const selectedTab = tabs.value[event.index];
-    selectedType.value = selectedTab.type;
-}
+// Sync activeIndex to selectedType
+watch(activeIndex, (newIndex) => {
+    if (newIndex >= 0 && newIndex < tabs.value.length) {
+        selectedType.value = tabs.value[newIndex].type;
+        // console.log('Active index changed:', newIndex, 'Updated selectedType:', selectedType.value);
+    }
+});
 
 </script>
 
@@ -163,7 +167,7 @@ function updateType(event) {
                         </span>
                     </div>
                 </div>
-                <Tabs v-model:value="activeIndex" class="w-full" @tab-change="updateType" >
+                <Tabs v-model:value="activeIndex" class="w-full">
                     <TabList>
                         <Tab 
                             v-for="(tab, index) in tabs" 

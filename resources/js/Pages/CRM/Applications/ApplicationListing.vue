@@ -18,7 +18,7 @@ import timezone from 'dayjs/plugin/timezone'
 import { trans, wTrans } from "laravel-vue-i18n";
 import DatePicker from 'primevue/datepicker';
 import debounce from "lodash/debounce.js";
-import Actions from "@/Pages/CRM/AccountManagerProfiles/Partials/Actions.vue";
+import ApplicationActions from "@/Pages/CRM/Applications/Partials/ApplicationActions.vue";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -30,7 +30,7 @@ const user = usePage().props.auth.user;
 const visible = ref(false);
 const loading = ref(false);
 const dt = ref(null);
-const accountManagerProfiles = ref([]);
+const applications = ref([]);
 const totalRecords = ref(0);
 const rows = ref(10);
 const page = ref(0);
@@ -55,7 +55,7 @@ const getResults = async () => {
     loading.value = true;
     try {
         // Define the base URL
-        let url = `/crm/accountManager/getAccountManagerProfiles?rows=${rows.value}&page=${page.value}`;
+        let url = `/crm/application/getApplications?rows=${rows.value}&page=${page.value}`;
 
         if (filters.value.global) {
             url += `&search=${filters.value.global}`;
@@ -69,11 +69,11 @@ const getResults = async () => {
         const response = await axios.get(url);
         
         // Update the data and total records with the response
-        accountManagerProfiles.value = response.data.data;
+        applications.value = response.data.data;
         totalRecords.value = response.data.totalRecords;
     } catch (error) {
         console.error('Error fetching leads data:', error);
-        accountManagerProfiles.value = [];
+        applications.value = [];
     } finally {
         loading.value = false;
     }
@@ -144,12 +144,12 @@ const copyToClipboard = (text) => {
 </script>
 
 <template>
-    <AuthenticatedLayout :title="`${$t('public.account_managers')}`">
+    <AuthenticatedLayout :title="`${$t('public.applications')}`">
         <div class="flex flex-col justify-center items-center px-3 py-5 self-stretch rounded-lg bg-white dark:bg-gray-900 shadow-card md:p-6 md:gap-6">
             <div class="flex flex-col pb-3 gap-3 items-center self-stretch md:flex-row md:gap-0 md:justify-between md:pb-0">
-                <span class="text-gray-950 dark:text-gray-100 font-semibold self-stretch md:self-auto">{{ $t('public.account_managers') }}</span>
+                <span class="text-gray-950 dark:text-gray-100 font-semibold self-stretch md:self-auto">{{ $t('public.applications') }}</span>
                 <div class="flex flex-col gap-3 items-center self-stretch md:flex-row md:gap-5">
-                    <Button variant="primary-outlined" @click="exportXLSX()" :disabled="accountManagerProfiles.length <= 0" class="w-full md:w-auto">
+                    <Button variant="primary-outlined" @click="exportXLSX()" :disabled="applications.length <= 0" class="w-full md:w-auto">
                         <IconDownload size="20" stroke-width="1.25" />
                         {{ $t('public.export') }}
                     </Button>
@@ -158,7 +158,7 @@ const copyToClipboard = (text) => {
             <DataTable
                 ref="dt"
                 :loading="loading"
-                :value="accountManagerProfiles"
+                :value="applications"
                 lazy
                 removableSort
                 :paginator="true"
@@ -224,7 +224,7 @@ const copyToClipboard = (text) => {
                         <span class="text-sm text-gray-700 dark:text-gray-300">{{ $t('public.loading') }}</span>
                     </div>
                 </template>
-                <template v-if="accountManagerProfiles?.length > 0">
+                <template v-if="applications?.length > 0">
                     <Column field="created_at" :header="$t('public.date')" sortable class="w-3/4 md:w-[20%] max-w-0 px-3">
                         <template #body="slotProps">
                             <div class="text-gray-950 dark:text-gray-100 text-sm">
@@ -232,29 +232,31 @@ const copyToClipboard = (text) => {
                             </div>
                         </template>
                     </Column>
-                    <Column field="file" :header="`${$t('public.file')}`" class="hidden md:table-cell w-[30%] max-w-0">
-                        <template #body="slotProps">
-                            <div class="text-gray-950 dark:text-gray-100 text-sm truncate">
-                                {{ slotProps.data.file }}
-                            </div>
-                        </template>
-                    </Column>
                     <Column field="name" :header="`${$t('public.name')}`" class="hidden md:table-cell w-[30%] max-w-0">
                         <template #body="slotProps">
                             <div class="flex flex-col items-start max-w-full">
                                 <div class="text-gray-950 dark:text-gray-100 font-semibold truncate max-w-full">
-                                    {{ slotProps.data?.user?.full_name }}
+                                    {{ slotProps.data?.acc_full_name }}
                                 </div>
                                 <div class="text-gray-500 dark:text-gray-300 text-xs truncate max-w-full">
-                                    {{ slotProps.data?.user?.email }}
+                                    {{ slotProps.data?.acc_email }}
+                                </div>
+                            </div>
+                        </template>
+                    </Column>
+                    <Column field="public_id" :header="`${$t('public.public_id')}`" class="hidden md:table-cell w-[30%] max-w-0">
+                        <template #body="slotProps">
+                            <div class="flex flex-col items-start max-w-full">
+                                <div class="text-gray-950 dark:text-gray-100 text-sm">
+                                    {{ slotProps.data.public_id }}
                                 </div>
                             </div>
                         </template>
                     </Column>
                     <Column field="action" :header="`${$t('public.action')}`" class="w-1/4 md:w-[20%] max-w-0 px-3">
                         <template #body="slotProps">
-                            <Actions 
-                                :account_manager="slotProps.data"
+                            <ApplicationActions 
+                                :application="slotProps.data"
                             />
                         </template>
                     </Column>
@@ -263,28 +265,24 @@ const copyToClipboard = (text) => {
         </div>
     </AuthenticatedLayout>
 
-    <Dialog v-model:visible="visible" modal :header="$t('public.account_manager_details')" class="dialog-xs md:dialog-md">
+    <Dialog v-model:visible="visible" modal :header="$t('public.application_details')" class="dialog-xs md:dialog-md">
         <div class="flex flex-col justify-center items-center gap-3 self-stretch pt-4 md:pt-6">
             <div class="flex flex-col items-center p-3 gap-3 self-stretch bg-gray-50 dark:bg-gray-700">
                 <div class="w-full flex flex-col items-start gap-1 md:flex-row">
-                    <span class="min-w-[200px] truncate text-gray-500 dark:text-gray-300 text-sm">{{ $t('public.date') }}</span>
+                    <span class="w-full max-w-[200px] truncate text-gray-500 dark:text-gray-300 text-sm">{{ $t('public.date') }}</span>
                     <span class="w-full text-gray-950 dark:text-gray-100 text-sm font-medium break-words">{{ data?.created_at ? data?.created_at : '-' }}</span>
                 </div>
                 <div class="w-full flex flex-col items-start gap-1 md:flex-row">
-                    <span class="min-w-[200px] truncate text-gray-500 dark:text-gray-300 text-sm">{{ $t('public.file') }}</span>
-                    <span class="w-full text-gray-950 dark:text-gray-100 text-sm font-medium break-all">{{ data?.file ? data?.file : '-' }}</span>
+                    <span class="w-full max-w-[200px] truncate text-gray-500 dark:text-gray-300 text-sm">{{ $t('public.name') }}</span>
+                    <span class="w-full text-gray-950 dark:text-gray-100 text-sm font-medium break-all">{{ data?.acc_full_name ? data?.acc_full_name : '-' }}</span>
                 </div>
                 <div class="w-full flex flex-col items-start gap-1 md:flex-row">
-                    <span class="min-w-[200px] truncate text-gray-500 dark:text-gray-300 text-sm">{{ $t('public.name') }}</span>
-                    <span class="w-full text-gray-950 dark:text-gray-100 text-sm font-medium truncate">{{ data?.user?.full_name ? data?.user?.full_name : '-' }}</span>
+                    <span class="w-full max-w-[200px] truncate text-gray-500 dark:text-gray-300 text-sm">{{ $t('public.email') }}</span>
+                    <span class="w-full text-gray-950 dark:text-gray-100 text-sm font-medium break-all">{{ data?.acc_email ? data?.acc_email : '-' }}</span>
                 </div>
                 <div class="w-full flex flex-col items-start gap-1 md:flex-row">
-                    <span class="min-w-[200px] truncate text-gray-500 dark:text-gray-300 text-sm">{{ $t('public.email') }}</span>
-                    <span class="w-full text-gray-950 dark:text-gray-100 text-sm font-medium truncate">{{ data?.user?.email ? data?.user?.email : '-' }}</span>
-                </div>
-                <div class="w-full flex flex-col items-start gap-1 md:flex-row">
-                    <span class="min-w-[200px] truncate text-gray-500 dark:text-gray-300 text-sm">{{ $t('public.site') }}</span>
-                    <span class="w-full text-gray-950 dark:text-gray-100 text-sm font-medium truncate">{{ data?.user?.site?.name ? data?.user?.site?.name : '-' }}</span>
+                    <span class="w-full max-w-[200px] truncate text-gray-500 dark:text-gray-300 text-sm">{{ $t('public.public_id') }}</span>
+                    <span class="w-full text-gray-950 dark:text-gray-100 text-sm font-medium break-all">{{ data?.public_id ? data?.public_id : '-' }}</span>
                 </div>
             </div>            
         </div>

@@ -10,7 +10,6 @@ import InputText from "primevue/inputtext";
 import Column from "primevue/column";
 import Button from '@/Components/Button.vue';
 import Select from "primevue/select";
-import { FilterMatchMode } from '@primevue/core/api';
 import Empty from "@/Components/Empty.vue";
 import { transactionFormat, formatToUserTimezone } from "@/Composables/index.js";
 import dayjs from "dayjs";
@@ -215,8 +214,8 @@ const copyToClipboard = (text) => {
                 </template>
                 <template #empty>
                     <Empty 
-                        :title="$t('public.empty_rebate_payout_record_title')" 
-                        :message="$t('public.empty_rebate_payout_record_message')" 
+                        :title="$t('public.empty_record_title')" 
+                        :message="$t('public.empty_record_message')" 
                     />
                 </template>
                 <template #loading>
@@ -226,7 +225,7 @@ const copyToClipboard = (text) => {
                     </div>
                 </template>
                 <template v-if="documents?.length > 0">
-                    <Column field="created_at" :header="$t('public.date')" class="w-3/4 md:w-[20%] max-w-0 px-3">
+                    <Column field="created_at" :header="$t('public.date')" sortable class="w-3/4 md:w-[20%] max-w-0 px-3">
                         <template #body="slotProps">
                             <div class="text-gray-950 dark:text-gray-100 text-sm">
                                 {{ slotProps.data.created_at }}

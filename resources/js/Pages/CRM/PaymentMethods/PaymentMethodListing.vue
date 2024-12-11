@@ -10,7 +10,6 @@ import InputText from "primevue/inputtext";
 import Column from "primevue/column";
 import Button from '@/Components/Button.vue';
 import Select from "primevue/select";
-import { FilterMatchMode } from '@primevue/core/api';
 import Empty from "@/Components/Empty.vue";
 import { transactionFormat, formatToUserTimezone } from "@/Composables/index.js";
 import dayjs from "dayjs";
@@ -215,8 +214,8 @@ const copyToClipboard = (text) => {
                 </template>
                 <template #empty>
                     <Empty 
-                        :title="$t('public.empty_rebate_payout_record_title')" 
-                        :message="$t('public.empty_rebate_payout_record_message')" 
+                        :title="$t('public.empty_record_title')" 
+                        :message="$t('public.empty_record_message')" 
                     />
                 </template>
                 <template #loading>
@@ -271,7 +270,7 @@ const copyToClipboard = (text) => {
             <div class="flex flex-col items-center p-3 gap-3 self-stretch bg-gray-50 dark:bg-gray-700">
                 <div class="w-full flex flex-col items-start gap-1 md:flex-row">
                     <span class="w-full max-w-[200px] truncate text-gray-500 dark:text-gray-300 text-sm">{{ $t('public.title') }}</span>
-                    <span class="w-full text-gray-950 dark:text-gray-100 text-sm font-medium break-words">{{ data?.title ? data?.title : '-' }}</span>
+                    <span class="w-full text-gray-950 dark:text-gray-100 text-sm font-medium break-all">{{ data?.title ? data?.title : '-' }}</span>
                 </div>
                 <div class="w-full flex flex-col items-start gap-1 md:flex-row">
                     <span class="w-full max-w-[200px] truncate text-gray-500 dark:text-gray-300 text-sm">{{ $t('public.cryptocurrency') }}</span>

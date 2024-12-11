@@ -206,11 +206,7 @@ const openDialog = (rowData) => {
                 </div>
             </template>
             <template #empty>
-                <Empty :message="$t('public.no_history_yet')">
-                    <template #image>
-                        <div class="w-60 h-[100px]"></div>
-                    </template>
-                </Empty>
+                <Empty :message="$t('public.no_history_yet')" />
             </template>
             <template #loading>
                 <div class="flex flex-col gap-2 items-center justify-center">
@@ -218,50 +214,52 @@ const openDialog = (rowData) => {
                     <span class="text-sm text-gray-700">{{ $t('public.loading') }}</span>
                 </div>
             </template>
-            <Column field="created_at" sortable style="width: 20%" headerClass="hidden md:table-cell" class="hidden md:table-cell">
-                <template #header>
-                    <span class="hidden md:block">{{ $t('public.date') }}</span>
-                </template>
-                <template #body="slotProps">
-                    <div class="text-gray-950 dark:text-gray-100 text-sm">
-                        {{ dayjs(slotProps.data.created_at).format('YYYY/MM/DD') }}
-                    </div>
-                </template>
-            </Column>
-            <Column field="trade_id" style="width: 20%" headerClass="hidden md:table-cell" class="hidden md:table-cell">
-                <template #header>
-                    <span class="hidden md:block">{{ $t('public.trade_id') }}</span>
-                </template>
-                <template #body="slotProps">
-                    <div class="text-gray-950 dark:text-gray-100 text-sm">
-                        {{ slotProps.data.trade_id }}
-                    </div>
-                </template>
-            </Column>
-            <Column field="action_type" style="width: 20%" headerClass="hidden md:table-cell" class="hidden md:table-cell">
-                <template #header>
-                    <span class="hidden md:block">{{ $t('public.type') }}</span>
-                </template>
-                <template #body="slotProps">
-                    {{ $t(`${slotProps.data.action_type}`) }}
-                </template>
-            </Column>
-            <Column field="profit" sortable style="width: 20%" headerClass="hidden md:table-cell" class="hidden md:table-cell">
-                <template #header>
-                    <span class="hidden md:block">{{ `${$t('public.amount')} ($)` }}</span>
-                </template>
-                <template #body="slotProps">
-                    {{ formatAmount(slotProps.data.profit) }}
-                </template>
-            </Column>
-            <Column field="limb_stage" style="width: 20%" headerClass="hidden md:table-cell" class="hidden md:table-cell">
-                <template #header>
-                    <span class="hidden md:block">{{ $t('public.stage') }}</span>
-                </template>
-                <template #body="slotProps">
-                    {{ slotProps.data?.limb_stage || '-' }}
-                </template>
-            </Column>
+            <template v-if="orders?.length > 0">
+                <Column field="created_at" sortable style="width: 20%" headerClass="hidden md:table-cell" class="hidden md:table-cell">
+                    <template #header>
+                        <span class="hidden md:block">{{ $t('public.date') }}</span>
+                    </template> 
+                    <template #body="slotProps">
+                        <div class="text-gray-950 dark:text-gray-100 text-sm">
+                            {{ dayjs(slotProps.data.created_at).format('YYYY/MM/DD') }}
+                        </div>
+                    </template>
+                </Column>
+                <Column field="trade_id" style="width: 20%" headerClass="hidden md:table-cell" class="hidden md:table-cell">
+                    <template #header>
+                        <span class="hidden md:block">{{ $t('public.trade_id') }}</span>
+                    </template>
+                    <template #body="slotProps">
+                        <div class="text-gray-950 dark:text-gray-100 text-sm">
+                            {{ slotProps.data.trade_id }}
+                        </div>
+                    </template>
+                </Column>
+                <Column field="action_type" style="width: 20%" headerClass="hidden md:table-cell" class="hidden md:table-cell">
+                    <template #header>
+                        <span class="hidden md:block">{{ $t('public.type') }}</span>
+                    </template>
+                    <template #body="slotProps">
+                        {{ $t(`${slotProps.data.action_type}`) }}
+                    </template>
+                </Column>
+                <Column field="profit" sortable style="width: 20%" headerClass="hidden md:table-cell" class="hidden md:table-cell">
+                    <template #header>
+                        <span class="hidden md:block">{{ `${$t('public.amount')} ($)` }}</span>
+                    </template>
+                    <template #body="slotProps">
+                        {{ formatAmount(slotProps.data.profit) }}
+                    </template>
+                </Column>
+                <Column field="limb_stage" style="width: 20%" headerClass="hidden md:table-cell" class="hidden md:table-cell">
+                    <template #header>
+                        <span class="hidden md:block">{{ $t('public.stage') }}</span>
+                    </template>
+                    <template #body="slotProps">
+                        {{ slotProps.data?.limb_stage || '-' }}
+                    </template>
+                </Column>
+            </template>
             <Column field="created_at" style="width: 20%" headerClass="hidden" class="md:hidden">
                 <template #body="slotProps">
                     <div class="w-full grid grid-cols-2">

@@ -29,6 +29,7 @@ import AccordionContent from 'primevue/accordioncontent';
 import dayjs from "dayjs";
 import utc from 'dayjs/plugin/utc'
 import timezone from 'dayjs/plugin/timezone'
+import Empty from "@/Components/Empty.vue";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -42,6 +43,7 @@ const props = defineProps({
 
 const leadNotes = ref();
 const visible = ref(false)
+const isLoading = ref(props.isLoading);
 // const countries = ref(props.countries)
 const selectedCountry = ref();
 const { formatRgbaColor } = generalFormat();
@@ -49,11 +51,15 @@ const { formatAmount } = transactionFormat();
 
 const getLeadNotes = async () => {
     try {
+        isLoading.value = true;
+
         const response = await axios.get(`/crm/lead/getLeadNotes?id=` + props.lead_id);
 
         leadNotes.value = response.data;
     } catch (error) {
         console.error('Error get network:', error);
+    } finally {
+        isLoading.value = false; // Set loading state to false after data fetch (success or failure)
     }
 };
 
@@ -173,6 +179,12 @@ const submitForm = () => {
                 </div>
             </div>
         </AccordionPanel>
+        <div v-if="!isLoading && leadNotes?.length <= 0">
+            <Empty 
+                :title="$t('public.empty_notes_title')" 
+                :message="$t('public.empty_notes_message')" 
+            />
+        </div>
     </Accordion>
 
     <!-- edit contact info -->

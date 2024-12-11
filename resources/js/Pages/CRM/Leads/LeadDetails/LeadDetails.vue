@@ -63,18 +63,23 @@ const tabs = ref([
 const selectedType = ref('lead_notes');
 const activeIndex = ref(tabs.value.findIndex(tab => tab.type === selectedType.value));
 
-// Watch for changes in selectedType and update the activeIndex accordingly
+// Sync selectedType to activeIndex
 watch(selectedType, (newType) => {
+    // console.log('Selected type changed:', newType);
     const index = tabs.value.findIndex(tab => tab.type === newType);
+    // console.log('Found index:', index);
     if (index >= 0) {
         activeIndex.value = index;
     }
 });
 
-function updateType(event) {
-    const selectedTab = tabs.value[event.index];
-    selectedType.value = selectedTab.type;
-}
+// Sync activeIndex to selectedType
+watch(activeIndex, (newIndex) => {
+    if (newIndex >= 0 && newIndex < tabs.value.length) {
+        selectedType.value = tabs.value[newIndex].type;
+        // console.log('Active index changed:', newIndex, 'Updated selectedType:', selectedType.value);
+    }
+});
 
 </script>
 
@@ -112,7 +117,7 @@ function updateType(event) {
                 </div>
                 <div class="w-full grid col-span-1">
                     <div class="w-full flex flex-col items-center p-3 gap-3 self-stretch rounded-lg bg-white dark:bg-gray-800 shadow-card md:px-6 md:py-5">
-                        <Tabs v-model:value="activeIndex" class="w-full" @tab-change="updateType" >
+                        <Tabs v-model:value="activeIndex" class="w-full" >
                             <TabList>
                                 <Tab 
                                     v-for="(tab, index) in tabs" 
@@ -122,15 +127,19 @@ function updateType(event) {
                                     {{ tab.title }}
                                 </Tab>
                             </TabList>
-                        </Tabs>
 
-                        <component 
-                            v-if="tabs[activeIndex].component"
-                            :is="tabs[activeIndex].component" 
-                            key="tabs[activeIndex].type" 
-                            :lead_id="props.lead.id"
-                            :isLoading="isLoading"
-                        />
+                            <TabPanels class="py-2">
+                                <TabPanel :key="activeIndex" :value="activeIndex">
+                                    <component 
+                                        :is="tabs[activeIndex].component" 
+                                        :key="tabs[activeIndex].type" 
+                                        :lead_id="props.lead.id" 
+                                        :isLoading="isLoading" 
+                                        v-if="tabs[activeIndex].component"
+                                    />
+                                </TabPanel>
+                            </TabPanels>
+                        </Tabs>
 
                         <!-- <LeadNotes
                             :lead_id="props.lead.id"

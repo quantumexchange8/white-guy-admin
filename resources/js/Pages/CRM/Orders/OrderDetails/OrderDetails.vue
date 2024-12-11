@@ -1,11 +1,18 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { usePage, useForm } from "@inertiajs/vue3";
-import { ref, watchEffect } from "vue";
+import { h, ref, watch, watchEffect } from "vue";
 import { IconChevronRight } from '@tabler/icons-vue';
 import Button from '@/Components/Button.vue';
 import OrderDetailInfo from '@/Pages/CRM/Orders/OrderDetails/Partials/OrderDetailInfo.vue';
+import OrderNotes from '@/Pages/CRM/Orders/OrderDetails/Partials/OrderNotes.vue';
 import OrderActionHistory from '@/Pages/CRM/Orders/OrderDetails/Partials/OrderActionHistory.vue';
+import Tabs from 'primevue/tabs';
+import TabList from 'primevue/tablist';
+import Tab from 'primevue/tab';
+import TabPanels from 'primevue/tabpanels';
+import TabPanel from 'primevue/tabpanel';
+import { wTrans } from "laravel-vue-i18n";
 
 const user = usePage().props.auth.user;
 
@@ -37,6 +44,40 @@ watchEffect(() => {
     }
 });
 
+const tabs = ref([
+    {   
+        title: wTrans('order_notes'),
+        type: 'order_notes',
+        component: h(OrderNotes),
+    },
+    {   
+        title: wTrans('order_history'),
+        type: 'order_history',
+        component: h(OrderActionHistory),
+    },
+]);
+
+const selectedType = ref('order_notes');
+const activeIndex = ref(tabs.value.findIndex(tab => tab.type === selectedType.value));
+
+// Sync selectedType to activeIndex
+watch(selectedType, (newType) => {
+    // console.log('Selected type changed:', newType);
+    const index = tabs.value.findIndex(tab => tab.type === newType);
+    // console.log('Found index:', index);
+    if (index >= 0) {
+        activeIndex.value = index;
+    }
+});
+
+// Sync activeIndex to selectedType
+watch(activeIndex, (newIndex) => {
+    if (newIndex >= 0 && newIndex < tabs.value.length) {
+        selectedType.value = tabs.value[newIndex].type;
+        // console.log('Active index changed:', newIndex, 'Updated selectedType:', selectedType.value);
+    }
+});
+
 </script>
 
 <template>
@@ -65,10 +106,37 @@ watchEffect(() => {
                     :orderDetail="orderDetail"
                     :isLoading="isLoading"
                 />
-                <OrderActionHistory
+                <!-- <OrderActionHistory
                     :order="props.order"
                     :isLoading="isLoading"
                 />
+                <OrderNotes
+                    :order="props.order"
+                    :isLoading="isLoading"
+                /> -->
+                <Tabs v-model:value="activeIndex" class="w-full" >
+                    <TabList>
+                        <Tab 
+                            v-for="(tab, index) in tabs" 
+                            :key="tab.title"
+                            :value="index"
+                        >
+                            {{ tab.title }}
+                        </Tab>
+                    </TabList>
+
+                    <TabPanels class="py-2">
+                        <TabPanel :key="activeIndex" :value="activeIndex">
+                            <component 
+                                :is="tabs[activeIndex].component" 
+                                :key="tabs[activeIndex].type" 
+                                :order="props.order" 
+                                :isLoading="isLoading" 
+                                v-if="tabs[activeIndex].component"
+                            />
+                        </TabPanel>
+                    </TabPanels>
+                </Tabs>
             </div>
         </div>
     </AuthenticatedLayout>

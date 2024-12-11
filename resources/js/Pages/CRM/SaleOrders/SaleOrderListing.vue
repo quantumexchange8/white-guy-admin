@@ -10,7 +10,6 @@ import InputText from "primevue/inputtext";
 import Column from "primevue/column";
 import Button from '@/Components/Button.vue';
 import Select from "primevue/select";
-import { FilterMatchMode } from '@primevue/core/api';
 import Empty from "@/Components/Empty.vue";
 import { transactionFormat, formatToUserTimezone } from "@/Composables/index.js";
 import dayjs from "dayjs";
@@ -257,8 +256,8 @@ const openDialog = (rowData) => {
                 </template>
                 <template #empty>
                     <Empty 
-                        :title="$t('public.empty_rebate_payout_record_title')" 
-                        :message="$t('public.empty_rebate_payout_record_message')" 
+                        :title="$t('public.empty_record_title')" 
+                        :message="$t('public.empty_record_message')" 
                     />
                 </template>
                 <template #loading>
@@ -309,7 +308,7 @@ const openDialog = (rowData) => {
                             </div>
                         </template>
                     </Column>
-                    <Column field="settlement_date" :header="`${$t('public.settlement_date')}`" class="hidden md:table-cell w-[20%] max-w-0">
+                    <Column field="settlement_date" :header="`${$t('public.settlement_date')}`" sortable class="hidden md:table-cell w-[20%] max-w-0">
                         <template #body="slotProps">
                             <div class="text-gray-950 dark:text-gray-100 text-sm">
                                 {{ slotProps.data.settlement_date ? slotProps.data.settlement_date : '-' }}

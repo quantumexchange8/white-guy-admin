@@ -24,6 +24,7 @@ import AccordionContent from 'primevue/accordioncontent';
 import dayjs from "dayjs";
 import utc from 'dayjs/plugin/utc'
 import timezone from 'dayjs/plugin/timezone'
+import Empty from "@/Components/Empty.vue";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -193,6 +194,9 @@ const extractChanges = (changes) => {
                 </div>
             </AccordionPanel>
         </Accordion>
+        <div v-if="!isLoading && documentActionHistories?.length <= 0">
+            <Empty :title="$t('public.empty_action_history_title')" :message="$t('public.empty_action_history_message')" />
+        </div>
     </div>
 
     <!-- edit contact info -->

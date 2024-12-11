@@ -10,7 +10,6 @@ import InputText from "primevue/inputtext";
 import Column from "primevue/column";
 import Button from '@/Components/Button.vue';
 import Select from "primevue/select";
-import { FilterMatchMode } from '@primevue/core/api';
 import Empty from "@/Components/Empty.vue";
 import { transactionFormat, formatToUserTimezone } from "@/Composables/index.js";
 import dayjs from "dayjs";
@@ -254,8 +253,8 @@ const openDialog = (rowData) => {
                 </template>
                 <template #empty>
                     <Empty 
-                        :title="$t('public.empty_rebate_payout_record_title')" 
-                        :message="$t('public.empty_rebate_payout_record_message')" 
+                        :title="$t('public.empty_record_title')" 
+                        :message="$t('public.empty_record_message')" 
                     />
                 </template>
                 <template #loading>
@@ -265,7 +264,7 @@ const openDialog = (rowData) => {
                     </div>
                 </template>
                 <template v-if="transactions?.length > 0">
-                    <Column field="last_name" sortable :header="$t('public.name')" class="w-3/4 md:w-[20%] max-w-0 px-3">
+                    <Column field="last_name" sortable :header="$t('public.name')" class="w-3/4 md:w-[25%] max-w-0 px-3">
                         <template #body="slotProps">
                             <div class="flex flex-col items-start max-w-full">
                                 <div class="text-gray-950 dark:text-gray-100 font-semibold truncate max-w-full">
@@ -277,7 +276,7 @@ const openDialog = (rowData) => {
                             </div>
                         </template>
                     </Column>
-                    <Column field="created_at" :header="$t('public.date')" sortable class="hidden md:table-cell w-full md:w-[15%] max-w-0">
+                    <Column field="created_at" :header="$t('public.date')" sortable class="hidden md:table-cell w-full md:w-[25%] max-w-0">
                         <template #body="slotProps">
                             <div class="text-gray-950 dark:text-gray-100 text-sm truncate max-w-full">
                                 <!-- {{ slotProps.data.created_at ? formatToUserTimezone(slotProps.data.created_at, user.timezone, true) : '-' }} -->
@@ -285,7 +284,7 @@ const openDialog = (rowData) => {
                             </div>
                         </template>
                     </Column>
-                    <Column field="assignee" :header="$t('public.assignee')" class="hidden md:table-cell w-[15%]">
+                    <Column field="assignee" :header="$t('public.assignee')" class="hidden md:table-cell w-[20%]">
                         <template #body="slotProps">
                             <div class="text-gray-950 dark:text-gray-100 text-sm">
                                 {{ slotProps.data.assignee?.username || '-' }}{{ slotProps.data.assignee?.site?.name ? ` (${slotProps.data.assignee.site.name})` : '' }}

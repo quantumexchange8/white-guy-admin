@@ -129,15 +129,15 @@ const submitForm = () => {
             <div v-else class="flex flex-col items-start gap-2 self-stretch">
                 <div class="w-full flex flex-col items-start gap-1">
                     <span class="w-full max-w-[200px] truncate text-gray-500 dark:text-gray-300 text-sm">{{ $t('public.title') }}</span>
-                    <span class="w-full text-gray-950 dark:text-gray-100 text-sm font-medium break-words">{{ notificationDetail?.title ? notificationDetail?.title : '-' }}</span>
+                    <span class="w-full text-gray-950 dark:text-gray-100 text-sm font-medium break-all">{{ notificationDetail?.title ? notificationDetail?.title : '-' }}</span>
                 </div>
                 <div class="w-full flex flex-col items-start gap-1">
                     <span class="w-full max-w-[200px] truncate text-gray-500 dark:text-gray-300 text-sm">{{ $t('public.description') }}</span>
-                    <span class="w-full text-gray-950 dark:text-gray-100 text-sm font-medium break-words">{{ notificationDetail?.description ? notificationDetail?.description : '-' }}</span>
+                    <span class="w-full text-gray-950 dark:text-gray-100 text-sm font-medium break-all">{{ notificationDetail?.description ? notificationDetail?.description : '-' }}</span>
                 </div>
                 <div class="w-full flex flex-col items-start gap-1">
                     <span class="w-full max-w-[200px] truncate text-gray-500 dark:text-gray-300 text-sm">{{ $t('public.attachment') }}</span>
-                    <span class="w-full text-gray-950 dark:text-gray-100 text-sm font-medium break-words">{{ notificationDetail?.attachment ? notificationDetail?.attachment : '-' }}</span>
+                    <span class="w-full text-gray-950 dark:text-gray-100 text-sm font-medium break-all">{{ notificationDetail?.attachment ? notificationDetail?.attachment : '-' }}</span>
                 </div>
                 <div class="w-full truncate grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-5">
                     <div class="w-full flex flex-col items-start gap-1">
@@ -154,11 +154,11 @@ const submitForm = () => {
                     </div>
                     <div class="w-full flex flex-col items-start gap-1">
                         <span class="w-full max-w-[200px] truncate text-gray-500 dark:text-gray-300 text-sm">{{ $t('public.receiver_name') }}</span>
-                        <span class="w-full text-gray-950 dark:text-gray-100 text-sm font-medium break-words">{{ notificationDetail?.user?.full_name ? notificationDetail?.user?.full_name : '-' }}</span>
+                        <span class="w-full text-gray-950 dark:text-gray-100 text-sm font-medium break-all">{{ notificationDetail?.user?.full_name ? notificationDetail?.user?.full_name : '-' }}</span>
                     </div>
                     <div class="w-full flex flex-col items-start gap-1">
                         <span class="w-full max-w-[200px] truncate text-gray-500 dark:text-gray-300 text-sm">{{ $t('public.receiver_email') }}</span>
-                        <span class="w-full text-gray-950 dark:text-gray-100 text-sm font-medium break-words">{{ notificationDetail?.user?.email ? notificationDetail?.user?.email : '-' }}</span>
+                        <span class="w-full text-gray-950 dark:text-gray-100 text-sm font-medium break-all">{{ notificationDetail?.user?.email ? notificationDetail?.user?.email : '-' }}</span>
                     </div>
                 </div>
             </div>

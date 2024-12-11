@@ -24,6 +24,7 @@ import AccordionContent from 'primevue/accordioncontent';
 import dayjs from "dayjs";
 import utc from 'dayjs/plugin/utc'
 import timezone from 'dayjs/plugin/timezone'
+import Empty from "@/Components/Empty.vue";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -37,6 +38,7 @@ const props = defineProps({
 
 const saleOrderActionHistories = ref();
 const visible = ref(false)
+const isLoading = ref(props.isLoading);
 // const countries = ref(props.countries)
 const selectedCountry = ref();
 const { formatRgbaColor } = generalFormat();
@@ -44,11 +46,14 @@ const { formatAmount } = transactionFormat();
 
 const getSaleOrderActionHistory = async () => {
     try {
+        isLoading.value = true;
         const response = await axios.get(`/crm/saleOrder/getSaleOrderLogEntries?id=` + props.sale_order.id);
 
         saleOrderActionHistories.value = response.data;
     } catch (error) {
         console.error('Error get network:', error);
+    } finally {
+        isLoading.value = false;
     }
 };
 
@@ -138,7 +143,7 @@ const extractChanges = (changes) => {
     <div class="w-full flex flex-col items-center p-3 gap-3 self-stretch rounded-lg bg-white dark:bg-gray-800 shadow-card md:px-6 md:py-5">
         <div class="flex flex-col justify-center items-center gap-2 self-stretch">
             <div class="flex justify-between items-start self-stretch">
-                <span class="w-full text-gray-950 dark:text-white font-bold text-xxl break-words">{{ $t('public.order_notes') }}</span>
+                <span class="w-full text-gray-950 dark:text-white font-bold text-xxl break-words">{{ $t('public.order_history') }}</span>
                 <!-- <Button
                     type="button"
                     iconOnly
@@ -207,6 +212,9 @@ const extractChanges = (changes) => {
                 </div>
             </AccordionPanel>
         </Accordion>
+        <div v-if="!isLoading && saleOrderActionHistories?.length <= 0">
+            <Empty :title="$t('public.empty_action_history_title')" :message="$t('public.empty_action_history_message')" />
+        </div>
     </div>
 
     <!-- edit contact info -->

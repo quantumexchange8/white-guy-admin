@@ -10,7 +10,6 @@ import InputText from "primevue/inputtext";
 import Column from "primevue/column";
 import Button from '@/Components/Button.vue';
 import Select from "primevue/select";
-import { FilterMatchMode } from '@primevue/core/api';
 import Empty from "@/Components/Empty.vue";
 import { transactionFormat, formatToUserTimezone } from "@/Composables/index.js";
 import dayjs from "dayjs";
@@ -190,8 +189,8 @@ const openDialog = (rowData) => {
                 </template>
                 <template #empty>
                     <Empty 
-                        :title="$t('public.empty_rebate_payout_record_title')" 
-                        :message="$t('public.empty_rebate_payout_record_message')" 
+                        :title="$t('public.empty_record_title')" 
+                        :message="$t('public.empty_record_message')" 
                     />
                 </template>
                 <template #loading>

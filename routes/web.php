@@ -19,6 +19,7 @@ use App\Http\Controllers\PaymentMethodController;
 use App\Http\Controllers\PrivateMessageController;
 use App\Http\Controllers\PaymentSubmissionController;
 use App\Http\Controllers\AccountManagerProfileController;
+use App\Http\Controllers\ApplicationController;
 
 Route::get('locale/{locale}', function ($locale) {
     App::setLocale($locale);
@@ -94,6 +95,13 @@ Route::get('/data/leads/categories', [LeadController::class, 'getCategories']);
             Route::get('/', [AccountManagerProfileController::class, 'index'])->name('crm.accountManager.index');
             Route::get('/getAccountManagerProfiles', [AccountManagerProfileController::class, 'getAccountManagerProfiles'])->name('crm.accountManager.getAccountManagerProfiles');
             Route::get('/getAccontManagerProfileLogEntries', [AccountManagerProfileController::class, 'getAccontManagerProfileLogEntries'])->name('crm.accountManager.getAccontManagerProfileLogEntries');
+
+        });
+
+        Route::prefix('application')->group(callback: function () {
+            Route::get('/', [ApplicationController::class, 'index'])->name('crm.application.index');
+            Route::get('/getApplications', [ApplicationController::class, 'getApplications'])->name('crm.application.getApplications');
+            Route::get('/getApplicationLogEntries', [ApplicationController::class, 'getApplicationLogEntries'])->name('crm.application.getApplicationLogEntries');
 
         });
 

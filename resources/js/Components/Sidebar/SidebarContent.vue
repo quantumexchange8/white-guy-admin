@@ -107,6 +107,12 @@ const pendingBonusWithdrawal = ref(0);
             />
 
             <SidebarCollapsibleItem
+                :title="$t('public.applications')"
+                :href="route('crm.application.index')"
+                :active="route().current('crm.application.*')"
+            />
+
+            <SidebarCollapsibleItem
                 :title="$t('public.members')"
                 :href="route('crm.member.index')"
                 :active="route().current('crm.member.*')"
