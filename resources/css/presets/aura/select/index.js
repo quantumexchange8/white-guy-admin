@@ -12,12 +12,12 @@ export default {
             { 'first:ml-0 ml-[-1px]': parent.instance.$name == 'InputGroup' && !props.showButtons },
 
             // Color and Background
-            { 'bg-white': !props.disabled },
+            { 'bg-white dark:bg-gray-800': !props.disabled },
 
             'border',
             { '': parent.instance.$name != 'InputGroup' },
             { '': parent.instance.$name == 'InputGroup' },
-            { 'border-gray-300': !props.invalid },
+            { 'border-gray-300 dark:border-gray-700': !props.invalid },
 
             // Invalid State
             // 'invalid:focus:ring-error-500',
@@ -37,7 +37,7 @@ export default {
             // Misc
             'cursor-pointer',
             'select-none',
-            { 'bg-gray-100 select-none pointer-events-none cursor-default': props.disabled },
+            { 'bg-gray-100 dark:bg-gray-700 select-none pointer-events-none cursor-default': props.disabled },
 
         ]
     }),
@@ -53,7 +53,7 @@ export default {
             // Color and Background
             'bg-transparent',
             'border-0',
-            { 'text-gray-950': props.modelValue != undefined, 'text-gray-400': props.modelValue == undefined },
+            { 'text-gray-950 dark:text-gray-100': props.modelValue != undefined, 'text-gray-400': props.modelValue == undefined },
             'placeholder:text-gray-400',
 
             // Sizing and Spacing
@@ -104,11 +104,11 @@ export default {
     overlay: {
         class: [
             // Colors
-            'bg-white',
-            'text-gray-950',
+            'bg-white dark:bg-gray-800',
+            'text-gray-950 dark:text-gray-100',
 
             // Shape
-            'border border-gray-300',
+            'border border-gray-300 dark:border-gray-700',
             'rounded',
             'shadow-dropdown',
 
@@ -144,16 +144,16 @@ export default {
 
             // Colors
             {
-                'text-gray-950': !context.focused && !context.selected,
-                'bg-primary-100': context.focused && !context.selected,
-                'text-primary-600': context.focused && !context.selected,
+                'text-gray-950 dark:text-gray-100': !context.focused && !context.selected,
+                'bg-primary-100 dark:bg-primary-700': context.focused && !context.selected,
+                'text-primary-600 dark:text-primary-100': context.focused && !context.selected,
 
-                'bg-primary-100 text-primary-600': context.selected
+                'bg-primary-100 dark:bg-primary-700 text-primary-600 dark:text-primary-100': context.selected
             },
 
             //States
-            { 'hover:bg-gray-100': !context.focused && !context.selected },
-            { 'hover:text-primary-600 hover:bg-primary-100': context.focused && !context.selected },
+            { 'hover:bg-gray-100 dark:bg-gray-800': !context.focused && !context.selected },
+            { 'hover:text-primary-600 dark:hover:text-primary-100 hover:bg-primary-100 dark:hover:bg-primary-700': context.focused && !context.selected },
 
             // Transition
             'transition-shadow duration-200',
@@ -188,7 +188,7 @@ export default {
             'py-3 px-4',
 
             // Color
-            'text-gray-950',
+            'text-gray-950 dark:text-gray-100',
             'bg-transparent'
         ]
     },
@@ -204,9 +204,9 @@ export default {
             'rounded-tr',
 
             // Color
-            'text-gray-950',
+            'text-gray-950 dark:text-gray-100',
             'bg-white',
-            'border-gray-300'
+            'border-gray-300 dark:border-gray-700'
         ]
     },
     clearIcon: {
