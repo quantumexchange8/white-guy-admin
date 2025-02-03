@@ -75,7 +75,7 @@ getMemberData();
 
 watchEffect(() => {
     if (usePage().props.toast !== null) {
-        getUserData();
+        getMemberData();
     }
 });
 

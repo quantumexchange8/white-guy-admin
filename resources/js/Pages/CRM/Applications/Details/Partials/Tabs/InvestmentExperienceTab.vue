@@ -19,7 +19,7 @@ dayjs.extend(utc);
 dayjs.extend(timezone);
 
 const props = defineProps({
-    saleOrderDetail: Object,
+    application: Object,
     isLoading: Boolean,
 });
 
@@ -67,11 +67,11 @@ const submitForm = () => {
 
 </script>
 
-<!-- saleOrdernfoTab.vue -->
+<!-- BasicInfoTab.vue -->
 <template>
     <div class="flex flex-col justify-center items-center gap-2 self-stretch">
         <div class="flex justify-between items-start self-stretch">
-            <span class="w-full text-gray-950 dark:text-gray-100 font-bold text-xxl break-words">{{ $t('public.client_details') }}</span>
+            <span class="w-full text-gray-950 dark:text-gray-100 font-bold text-xxl break-words">{{ $t('public.investment_experience') }}</span>
             <Button
                 type="button"
                 iconOnly
@@ -89,105 +89,137 @@ const submitForm = () => {
 
         <div v-if="isLoading" class="w-full grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-5 animate-pulse">
             <div class="flex flex-col gap-2">
-                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.contact_name') }}</div>
+                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.experience_mutual_funds_years') }}</div>
                 <div class="truncate text-gray-700 dark:text-gray-300 font-medium">
                     <div class="h-2 bg-gray-200 rounded-full w-48 my-2"></div>
                 </div>
             </div>
             <div class="flex flex-col gap-2">
-                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.email') }}</div>
-                <div class="h-3 bg-gray-200 rounded-full w-20 mt-1 mb-1.5"></div>
+                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.experience_mutual_funds_transactions') }}</div>
+                <div class="h-2 bg-gray-200 rounded-full w-36 my-2"></div>
             </div>
             <div class="flex flex-col gap-2">
-                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.date_of_birth') }}</div>
-                <div class="h-3 bg-gray-200 rounded-full w-36 mt-1 mb-1.5"></div>
+                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.experience_individual_stocks_years') }}</div>
+                <div class="h-2 bg-gray-200 rounded-full w-36 my-2"></div>
             </div>
             <div class="flex flex-col gap-2">
-                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.home_number') }}</div>
+                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.experience_individual_stocks_transactions') }}</div>
+                <div class="h-2 bg-gray-200 rounded-full w-36 my-2"></div>
+            </div>
+            <div class="flex flex-col gap-2">
+                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.experience_bonds_years') }}</div>
                 <div class="h-2 bg-gray-200 rounded-full w-36 mt-2 mb-1"></div>
             </div>
             <div class="flex flex-col gap-2">
-                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.mobile_number') }}</div>
+                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.experience_bonds_transactions') }}</div>
                 <div class="h-2 bg-gray-200 rounded-full w-36 mt-2 mb-1"></div>
             </div>
             <div class="flex flex-col gap-2">
-                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.address_1') }}</div>
+                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.experience_options_years') }}</div>
                 <div class="h-2 bg-gray-200 rounded-full w-36 mt-2 mb-1"></div>
             </div>
             <div class="flex flex-col gap-2">
-                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.address_2') }}</div>
+                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.experience_options_transactions') }}</div>
                 <div class="h-2 bg-gray-200 rounded-full w-36 mt-2 mb-1"></div>
             </div>
             <div class="flex flex-col gap-2">
-                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.city') }}</div>
+                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.experience_securities_futures_years') }}</div>
                 <div class="h-2 bg-gray-200 rounded-full w-36 mt-2 mb-1"></div>
             </div>
             <div class="flex flex-col gap-2">
-                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.country') }}</div>
+                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.experience_securities_futures_transactions') }}</div>
                 <div class="h-2 bg-gray-200 rounded-full w-36 mt-2 mb-1"></div>
             </div>
             <div class="flex flex-col gap-2">
-                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.office_number_1') }}</div>
+                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.experience_annuities_years') }}</div>
                 <div class="h-2 bg-gray-200 rounded-full w-36 mt-2 mb-1"></div>
             </div>
             <div class="flex flex-col gap-2">
-                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.office_number_2') }}</div>
+                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.experience_annuities_transactions') }}</div>
                 <div class="h-2 bg-gray-200 rounded-full w-36 mt-2 mb-1"></div>
             </div>
             <div class="flex flex-col gap-2">
-                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.fax_number') }}</div>
+                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.experience_alternative_years') }}</div>
+                <div class="h-2 bg-gray-200 rounded-full w-36 mt-2 mb-1"></div>
+            </div>
+            <div class="flex flex-col gap-2">
+                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.experience_alternative_transactions') }}</div>
+                <div class="h-2 bg-gray-200 rounded-full w-36 mt-2 mb-1"></div>
+            </div>
+            <div class="flex flex-col gap-2">
+                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.experience_margin_years') }}</div>
+                <div class="h-2 bg-gray-200 rounded-full w-36 mt-2 mb-1"></div>
+            </div>
+            <div class="flex flex-col gap-2">
+                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.experience_margin_transactions') }}</div>
                 <div class="h-2 bg-gray-200 rounded-full w-36 mt-2 mb-1"></div>
             </div>
         </div>
 
         <div v-else class="w-full grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-5">
             <div class="flex flex-col gap-2">
-                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.contact_name') }}</div>
-                <div class="truncate text-gray-700 dark:text-gray-300 font-medium">{{ props.saleOrderDetail?.contact_name ? props.saleOrderDetail.contact_name : '-' }}</div>
+                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.experience_mutual_funds_years') }}</div>
+                <div class="truncate text-gray-700 dark:text-gray-300 font-medium">{{ props.application?.experience_mutual_funds_years ? props.application?.experience_mutual_funds_years : '-' }}</div>
             </div>
             <div class="flex flex-col gap-2">
-                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.email') }}</div>
-                <div class="truncate text-gray-700 dark:text-gray-300 font-medium">{{ props.saleOrderDetail?.email || '-' }}</div>
+                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.experience_mutual_funds_transactions') }}</div>
+                <div class="truncate text-gray-700 dark:text-gray-300 font-medium">{{ props.application?.experience_mutual_funds_transactions || '-' }}</div>
             </div>
             <div class="flex flex-col gap-2">
-                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.date_of_birth') }}</div>
-                <div class="truncate text-gray-700 dark:text-gray-300 font-medium">{{ props.saleOrderDetail?.date_of_birth || '-' }}</div>
+                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.experience_individual_stocks_years') }}</div>
+                <div class="truncate text-gray-700 dark:text-gray-300 font-medium">{{ props.application?.experience_individual_stocks_years || '-' }}</div>
             </div>
             <div class="flex flex-col gap-2">
-                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.home_number') }}</div>
-                <div class="truncate text-gray-700 dark:text-gray-300 font-medium">{{ props.saleOrderDetail?.home_number || '-' }}</div>
+                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.experience_individual_stocks_transactions') }}</div>
+                <div class="text-gray-700 dark:text-gray-300 font-medium break-all">{{ props.application?.experience_individual_stocks_transactions || '-' }}</div>
             </div>
             <div class="flex flex-col gap-2">
-                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.mobile_number') }}</div>
-                <div class="truncate text-gray-700 dark:text-gray-300 font-medium">{{ props.saleOrderDetail?.mobile_number || '-' }}</div>
+                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.experience_bonds_years') }}</div>
+                <div class="truncate text-gray-700 dark:text-gray-300 font-medium">{{ props.application?.experience_bonds_years || '-' }}</div>
             </div>
             <div class="flex flex-col gap-2">
-                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.address_1') }}</div>
-                <div class="truncate text-gray-700 dark:text-gray-300 font-medium">{{ props.saleOrderDetail?.address_1 || '-' }}</div>
+                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.experience_bonds_transactions') }}</div>
+                <div class="truncate text-gray-700 dark:text-gray-300 font-medium">{{ props.application?.experience_bonds_transactions || '-' }}</div>
             </div>
             <div class="flex flex-col gap-2">
-                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.address_2') }}</div>
-                <div class="truncate text-gray-700 dark:text-gray-300 font-medium">{{ props.saleOrderDetail?.address_2 || '-' }}</div>
+                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.experience_options_years') }}</div>
+                <div class="truncate text-gray-700 dark:text-gray-300 font-medium">{{ props.application?.experience_options_years || '-' }}</div>
             </div>
             <div class="flex flex-col gap-2">
-                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.city') }}</div>
-                <div class="truncate text-gray-700 dark:text-gray-300 font-medium">{{ props.saleOrderDetail?.city || '-' }}</div>
+                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.experience_options_transactions') }}</div>
+                <div class="truncate text-gray-700 dark:text-gray-300 font-medium">{{ props.application?.experience_options_transactions || '-' }}</div>
             </div>
             <div class="flex flex-col gap-2">
-                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.country') }}</div>
-                <div class="truncate text-gray-700 dark:text-gray-300 font-medium">{{ props.saleOrderDetail?.country || '-' }}</div>
+                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.experience_securities_futures_years') }}</div>
+                <div class="truncate text-gray-700 dark:text-gray-300 font-medium">{{ props.application?.experience_securities_futures_years || '-' }}</div>
             </div>
             <div class="flex flex-col gap-2">
-                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.office_number_1') }}</div>
-                <div class="truncate text-gray-700 dark:text-gray-300 font-medium">{{ props.saleOrderDetail?.office_number_1 || '-' }}</div>
+                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.experience_securities_futures_transactions') }}</div>
+                <div class="truncate text-gray-700 dark:text-gray-300 font-medium">{{ props.application?.experience_securities_futures_transactions || '-' }}</div>
             </div>
             <div class="flex flex-col gap-2">
-                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.office_number_2') }}</div>
-                <div class="truncate text-gray-700 dark:text-gray-300 font-medium">{{ props.saleOrderDetail?.office_number_2 || '-' }}</div>
+                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.experience_annuities_years') }}</div>
+                <div class="truncate text-gray-700 dark:text-gray-300 font-medium">{{ props.application?.experience_annuities_years || '-' }}</div>
             </div>
             <div class="flex flex-col gap-2">
-                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.fax_number') }}</div>
-                <div class="truncate text-gray-700 dark:text-gray-300 font-medium">{{ props.saleOrderDetail?.fax_number || '-' }}</div>
+                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.experience_annuities_transactions') }}</div>
+                <div class="truncate text-gray-700 dark:text-gray-300 font-medium">{{ props.application?.experience_annuities_transactions || '-' }}</div>
+            </div>
+            <div class="flex flex-col gap-2">
+                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.experience_alternative_years') }}</div>
+                <div class="truncate text-gray-700 dark:text-gray-300 font-medium">{{ props.application?.experience_alternative_years || '-' }}</div>
+            </div>
+            <div class="flex flex-col gap-2">
+                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.experience_alternative_transactions') }}</div>
+                <div class="truncate text-gray-700 dark:text-gray-300 font-medium">{{ props.application?.experience_alternative_transactions || '-' }}</div>
+            </div>
+            <div class="flex flex-col gap-2">
+                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.experience_margin_years') }}</div>
+                <div class="truncate text-gray-700 dark:text-gray-300 font-medium">{{ props.application?.experience_margin_years || '-' }}</div>
+            </div>
+            <div class="flex flex-col gap-2">
+                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.experience_margin_transactions') }}</div>
+                <div class="truncate text-gray-700 dark:text-gray-300 font-medium">{{ props.application?.experience_margin_transactions || '-' }}</div>
             </div>
         </div>
     </div>

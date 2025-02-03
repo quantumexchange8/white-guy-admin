@@ -40,7 +40,7 @@ getOrderData();
 
 watchEffect(() => {
     if (usePage().props.toast !== null) {
-        getUserData();
+        getOrderData();
     }
 });
 

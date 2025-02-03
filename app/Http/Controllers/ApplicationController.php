@@ -73,17 +73,69 @@ class ApplicationController extends Controller
         // Paginate the query
         $data = $query->simplePaginate($rowsPerPage, ['*'], 'page', $currentPage);
 
+        $statusArray = [ 
+            "Pending", "Approved", "Cancelled"
+        ];
+        
+        $acc_types = ["Individual", "Joint", "Trust", "Corporate"];
+
+        foreach ($data as $applicant) {
+            if (!is_null($applicant->status) && $applicant->status !== '') {
+                $applicant->status = $statusArray[$applicant->status - 1];
+            }
+
+            if (!is_null($applicant->account_type) && $applicant->account_type !== '') {
+                $applicant->account_type = $acc_types[$applicant->account_type - 1];
+            }
+        }
+
         return response()->json([
             'data' => $data->items(),
             'totalRecords' => $totalRecords, // Matches PrimeVue's 'totalRecords' field
-            'current_page' => $data->currentPage(),
-            'first_page_url' => $data->url(1),
-            'next_page_url' => $data->hasMorePages() ? $data->nextPageUrl() : null,
-            'prev_page_url' => $data->previousPageUrl(),
-            'path' => $data->path(),
-            'per_page' => $data->perPage(),
-            'from' => $data->firstItem(),
-            'to' => $data->lastItem(),
+        ]);
+    }
+
+    public function detail($id)
+    {
+        $application = Application::find($id);
+
+        return Inertia::render('CRM/Applications/Details/ApplicantDetails', [
+            'application' => $application,
+        ]);
+    }
+
+    public function getApplicationData(Request $request)
+    {
+        // Validate the input to ensure 'id' is provided
+        $request->validate([
+            'id' => 'required'
+        ]);
+    
+        // Fetch the application with their associated data
+        $application = Application::with(['user', 'site'])
+            ->find($request->input('id'));
+    
+        if (!$application) {
+            return response()->json(['error' => 'Application not found'], 404);
+        }
+        
+        $statusArray = [ 
+            "Pending", "Approved", "Cancelled"
+        ];
+        
+        $acc_types = ["Individual", "Joint", "Trust", "Corporate"];
+
+        if (!is_null(value: $application->status) && $application->status !== '') {
+            $application->status = $statusArray[$application->status - 1] ?? $application->status; // Fallback to original if out of range
+        }
+
+        if (!is_null(value: $application->account_type) && $application->account_type !== '') {
+            $application->account_type = $acc_types[$application->account_type - 1] ?? $application->account_type; // Fallback to original if out of range
+        }
+
+        // Return the transformed application data under 'applicationDetail' key
+        return response()->json([
+            'applicationDetail' => $application,
         ]);
     }
 

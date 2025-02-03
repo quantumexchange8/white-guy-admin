@@ -10,7 +10,7 @@ export default {
             'm-0',
 
             // Color
-            'bg-white dark:bg-gray-800',
+            'bg-white dark:bg-gray-900',
             '[&:last-child]:border-b',
             'border-gray-200 dark:border-gray-700',
 

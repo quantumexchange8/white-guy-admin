@@ -77,14 +77,6 @@ class PrivateMessageController extends Controller
         return response()->json([
             'data' => $data->items(),
             'totalRecords' => $totalRecords, // Matches PrimeVue's 'totalRecords' field
-            'current_page' => $data->currentPage(),
-            'first_page_url' => $data->url(1),
-            'next_page_url' => $data->hasMorePages() ? $data->nextPageUrl() : null,
-            'prev_page_url' => $data->previousPageUrl(),
-            'path' => $data->path(),
-            'per_page' => $data->perPage(),
-            'from' => $data->firstItem(),
-            'to' => $data->lastItem(),
         ]);
     }
 

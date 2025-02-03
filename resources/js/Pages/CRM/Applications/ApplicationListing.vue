@@ -232,7 +232,7 @@ const copyToClipboard = (text) => {
                             </div>
                         </template>
                     </Column>
-                    <Column field="name" :header="`${$t('public.name')}`" class="hidden md:table-cell w-[30%] max-w-0">
+                    <Column field="name" :header="`${$t('public.name')}`" class="hidden md:table-cell w-[20%] max-w-0">
                         <template #body="slotProps">
                             <div class="flex flex-col items-start max-w-full">
                                 <div class="text-gray-950 dark:text-gray-100 font-semibold truncate max-w-full">
@@ -244,16 +244,34 @@ const copyToClipboard = (text) => {
                             </div>
                         </template>
                     </Column>
-                    <Column field="public_id" :header="`${$t('public.public_id')}`" class="hidden md:table-cell w-[30%] max-w-0">
+                    <Column field="account_type" :header="`${$t('public.account_type')}`" class="hidden md:table-cell w-[15%] max-w-0">
                         <template #body="slotProps">
                             <div class="flex flex-col items-start max-w-full">
                                 <div class="text-gray-950 dark:text-gray-100 text-sm">
-                                    {{ slotProps.data.public_id }}
+                                    {{ slotProps.data.account_type }}
                                 </div>
                             </div>
                         </template>
                     </Column>
-                    <Column field="action" :header="`${$t('public.action')}`" class="w-1/4 md:w-[20%] max-w-0 px-3">
+                    <Column field="prof_job_title " :header="`${$t('public.job_title ')}`" class="hidden md:table-cell w-[15%] max-w-0">
+                        <template #body="slotProps">
+                            <div class="flex flex-col items-start max-w-full">
+                                <div class="text-gray-950 dark:text-gray-100 text-sm break-all">
+                                    {{ slotProps.data.prof_job_title || '-'  }}
+                                </div>
+                            </div>
+                        </template>
+                    </Column>
+                    <Column field="status " :header="`${$t('public.status ')}`" class="hidden md:table-cell w-[15%] max-w-0">
+                        <template #body="slotProps">
+                            <div class="flex flex-col items-start max-w-full">
+                                <div class="text-gray-950 dark:text-gray-100 text-sm">
+                                    {{ slotProps.data.status  }}
+                                </div>
+                            </div>
+                        </template>
+                    </Column>
+                    <Column field="action" :header="`${$t('public.action')}`" class="w-1/4 md:w-[15%] max-w-0 px-3">
                         <template #body="slotProps">
                             <ApplicationActions 
                                 :application="slotProps.data"
@@ -281,8 +299,20 @@ const copyToClipboard = (text) => {
                     <span class="w-full text-gray-950 dark:text-gray-100 text-sm font-medium break-all">{{ data?.acc_email ? data?.acc_email : '-' }}</span>
                 </div>
                 <div class="w-full flex flex-col items-start gap-1 md:flex-row">
-                    <span class="w-full max-w-[200px] truncate text-gray-500 dark:text-gray-300 text-sm">{{ $t('public.public_id') }}</span>
-                    <span class="w-full text-gray-950 dark:text-gray-100 text-sm font-medium break-all">{{ data?.public_id ? data?.public_id : '-' }}</span>
+                    <span class="w-full max-w-[200px] truncate text-gray-500 dark:text-gray-300 text-sm">{{ $t('public.job_title') }}</span>
+                    <span class="w-full text-gray-950 dark:text-gray-100 text-sm font-medium break-all">{{ data?.prof_job_title ? data?.prof_job_title : '-' }}</span>
+                </div>
+                <div class="w-full flex flex-col items-start gap-1 md:flex-row">
+                    <span class="w-full max-w-[200px] truncate text-gray-500 dark:text-gray-300 text-sm">{{ $t('public.employment_status') }}</span>
+                    <span class="w-full text-gray-950 dark:text-gray-100 text-sm font-medium break-all">{{ data?.prof_employment_status ? data?.prof_employment_status : '-' }}</span>
+                </div>
+                <div class="w-full flex flex-col items-start gap-1 md:flex-row">
+                    <span class="w-full max-w-[200px] truncate text-gray-500 dark:text-gray-300 text-sm">{{ $t('public.account_type') }}</span>
+                    <span class="w-full text-gray-950 dark:text-gray-100 text-sm font-medium break-all">{{ data?.account_type ? data?.account_type : '-' }}</span>
+                </div>
+                <div class="w-full flex flex-col items-start gap-1 md:flex-row">
+                    <span class="w-full max-w-[200px] truncate text-gray-500 dark:text-gray-300 text-sm">{{ $t('public.status') }}</span>
+                    <span class="w-full text-gray-950 dark:text-gray-100 text-sm font-medium break-all">{{ data?.status ? data?.status : '-' }}</span>
                 </div>
             </div>            
         </div>

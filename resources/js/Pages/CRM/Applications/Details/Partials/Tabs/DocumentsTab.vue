@@ -19,7 +19,8 @@ dayjs.extend(utc);
 dayjs.extend(timezone);
 
 const props = defineProps({
-    leadDetail: Object,
+    application: Object,
+    isLoading: Boolean,
 });
 
 const user = usePage().props.auth.user;
@@ -66,11 +67,11 @@ const submitForm = () => {
 
 </script>
 
-<!-- DataAndAppointmentTab.vue -->
+<!-- BasicInfoTab.vue -->
 <template>
     <div class="flex flex-col justify-center items-center gap-2 self-stretch">
         <div class="flex justify-between items-start self-stretch">
-            <span class="w-full text-gray-950 dark:text-gray-100 font-bold text-xxl break-words">{{ $t('public.data_and_appointment') }}</span>
+            <span class="w-full text-gray-950 dark:text-gray-100 font-bold text-xxl break-words">{{ $t('public.documents') }}</span>
             <Button
                 type="button"
                 iconOnly
@@ -86,60 +87,27 @@ const submitForm = () => {
 
         <div class="h-[1px] self-stretch bg-gray-200" />
 
-        <div v-if="props.leadDetail" class="w-full grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-5">
+        <div v-if="isLoading" class="w-full grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-5 animate-pulse">
             <div class="flex flex-col gap-2">
-                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.data_source') }}</div>
-                <div class="truncate text-gray-700 dark:text-gray-300 font-medium">{{ props.leadDetail?.data_source || '-' }}</div>
-            </div>
-            <div class="flex flex-col gap-2">
-                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.data_code') }}</div>
-                <div class="truncate text-gray-700 dark:text-gray-300 font-medium">{{ props.leadDetail?.data_code || '-' }}</div>
-            </div>
-            <div class="flex flex-col gap-2">
-                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.data_type') }}</div>
-                <div class="truncate text-gray-700 dark:text-gray-300 font-medium">{{ props.leadDetail?.data_type || '-' }}</div>
-            </div>
-            <div class="flex flex-col gap-2">
-                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.appointment_label') }}</div>
-                <div class="truncate text-gray-700 dark:text-gray-300 font-medium">{{ props.leadDetail?.appointment_label?.title || '-' }}</div>
-            </div>
-            <div class="flex flex-col gap-2">
-                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.appointment_start') }}</div>
-                <!-- <div class="truncate text-gray-700 dark:text-gray-300 font-medium">{{ props.leadDetail?.appointment_start_at ? formatToUserTimezone(props.leadDetail.appointment_start_at, user.timezone, true) : '-' }}</div> -->
-                <div class="truncate text-gray-700 dark:text-gray-300 font-medium">{{ props.leadDetail?.appointment_start_at ? props.leadDetail.appointment_start_at : '-' }}</div>
-            </div>
-            <div class="flex flex-col gap-2">
-                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.appointment_end') }}</div>
-                <!-- <div class="truncate text-gray-700 dark:text-gray-300 font-medium">{{ props.leadDetail?.appointment_end_at ? formatToUserTimezone(props.leadDetail.appointment_end_at, user.timezone, true) : '-' }}</div> -->
-                <div class="truncate text-gray-700 dark:text-gray-300 font-medium">{{ props.leadDetail?.appointment_end_at ? props.leadDetail.appointment_end_at : '-' }}</div>
-            </div>
-        </div>
-        <div v-else class="w-full grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-5 animate-pulse">
-            <div class="flex flex-col gap-2">
-                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.data_source') }}</div>
+                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.identification_document') }}</div>
                 <div class="truncate text-gray-700 dark:text-gray-300 font-medium">
                     <div class="h-2 bg-gray-200 rounded-full w-48 my-2"></div>
                 </div>
             </div>
             <div class="flex flex-col gap-2">
-                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.data_code') }}</div>
+                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.proof_of_address_document') }}</div>
                 <div class="h-2 bg-gray-200 rounded-full w-36 my-2"></div>
             </div>
+        </div>
+
+        <div v-else class="w-full grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-5">
             <div class="flex flex-col gap-2">
-                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.data_type') }}</div>
-                <div class="h-3 bg-gray-200 rounded-full w-20 mt-1 mb-1.5"></div>
+                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.identification_document') }}</div>
+                <div class="text-gray-700 dark:text-gray-300 font-medium break-all">{{ props.application?.identification_document ? props.application?.identification_document : '-' }}</div>
             </div>
             <div class="flex flex-col gap-2">
-                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.appointment_label') }}</div>
-                <div class="h-3 bg-gray-200 rounded-full w-36 mt-1 mb-1.5"></div>
-            </div>
-            <div class="flex flex-col gap-2">
-                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.appointment_start') }}</div>
-                <div class="h-2 bg-gray-200 rounded-full w-36 mt-2 mb-1"></div>
-            </div>
-            <div class="flex flex-col gap-2">
-                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.appointment_end') }}</div>
-                <div class="h-2 bg-gray-200 rounded-full w-36 mt-2 mb-1"></div>
+                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.proof_of_address_document') }}</div>
+                <div class="text-gray-700 dark:text-gray-300 font-medium break-all">{{ props.application?.proof_of_address_document || '-' }}</div>
             </div>
         </div>
     </div>

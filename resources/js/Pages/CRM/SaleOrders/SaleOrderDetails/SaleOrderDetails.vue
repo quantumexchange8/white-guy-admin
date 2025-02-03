@@ -74,7 +74,7 @@ getSaleOrderData();
 
 watchEffect(() => {
     if (usePage().props.toast !== null) {
-        getUserData();
+        getSaleOrderData();
     }
 });
 

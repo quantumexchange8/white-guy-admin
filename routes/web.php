@@ -101,6 +101,8 @@ Route::get('/data/leads/categories', [LeadController::class, 'getCategories']);
         Route::prefix('application')->group(callback: function () {
             Route::get('/', [ApplicationController::class, 'index'])->name('crm.application.index');
             Route::get('/getApplications', [ApplicationController::class, 'getApplications'])->name('crm.application.getApplications');
+            Route::get('/detail/{id}', [ApplicationController::class, 'detail'])->name('crm.application.detail');
+            Route::get('/getApplicationData', [ApplicationController::class, 'getApplicationData'])->name('crm.application.getApplicationData');
             Route::get('/getApplicationLogEntries', [ApplicationController::class, 'getApplicationLogEntries'])->name('crm.application.getApplicationLogEntries');
 
         });

@@ -43,7 +43,7 @@ getLeadData();
 
 watchEffect(() => {
     if (usePage().props.toast !== null) {
-        getUserData();
+        getLeadData();
     }
 });
 

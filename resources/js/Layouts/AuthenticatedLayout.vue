@@ -15,7 +15,7 @@ defineProps({
     <Head :title="title"></Head>
 
     <div
-        class="min-h-screen bg-gray-25 dark:bg-gray-950"
+        class="min-h-screen bg-gray-50 dark:bg-gray-950"
     >
         <!-- Sidebar -->
         <Sidebar />

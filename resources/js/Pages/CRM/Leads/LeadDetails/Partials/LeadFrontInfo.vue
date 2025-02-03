@@ -84,18 +84,18 @@ const submitForm = () => {
 
 const tabs = ref([
     {   
-        title: wTrans('public.lead_details'),
-        type: 'lead_details',
+        title: wTrans('public.basic_info'),
+        type: 'basic_info',
         component: h(BasicInfoTab),
     },
     {   
-        title: wTrans('public.data_and_appointment'),
-        type: 'data_and_appointment',
+        title: wTrans('public.financial_details'),
+        type: 'financial_details',
         component: h(FinancialDetailTab),
     },
 ]);
 
-const selectedType = ref('lead_details');
+const selectedType = ref('basic_info');
 const activeIndex = ref(tabs.value.findIndex(tab => tab.type === selectedType.value));
 
 // Sync selectedType to activeIndex
@@ -121,59 +121,31 @@ watch(activeIndex, (newIndex) => {
 <template>
     <div class="w-full flex flex-col items-center p-3 gap-3 self-stretch rounded-lg bg-white dark:bg-gray-800 shadow-card md:px-6 md:py-5">
         <div class="flex flex-col justify-center items-center gap-2 self-stretch">
-            <div class="flex justify-between items-start self-stretch">
-                <span class="w-full text-gray-950 dark:text-gray-100 font-bold text-xxl break-words">{{ $t('public.lead_front_details') }}</span>
-                <Button
-                    type="button"
-                    iconOnly
-                    size="base"
-                    variant="gray-text"
-                    pill
-                    @click="openDialog()"
-                    :disabled="!leadFront && isLoading"
-                >
-                    <IconPencilMinus size="20" />
-                </Button>
-            </div>
-            <div v-if="isLoading" class="animate-pulse flex flex-col items-start gap-1.5 self-stretch">
-                <div class="h-4 bg-gray-200 rounded-full w-48 my-2 md:my-3"></div>
-            </div>
-            <div v-else class="flex flex-col items-start gap-1 self-stretch">
-                <div class="grid items-start gap-1 self-stretch">
-                    <span class="w-full truncate self-stretch text-gray-950 dark:text-gray-100 text-xl font-bold">
-                        {{ leadFront?.name ? leadFront.name : '-' }}
-                    </span>
-                    <span class="w-full truncate self-stretch text-gray-500 dark:text-gray-100 text-sm font-bold">
-                        {{ leadFront?.email ? leadFront.email : '-' }}
-                    </span>
-                    <div class="w-full truncate flex items-start gap-1 self-stretch">
-                        <IconPhone size="20" stroke-width="1.25" class="text-gray-500" />
-                        <span class="w-full truncate self-stretch text-gray-500 dark:text-gray-100 text-sm font-bold">
-                            {{ leadFront?.phone_number ? leadFront.phone_number : '-' }}
-                        </span>
-                    </div>
-                </div>
-                <Tabs v-model:value="activeIndex" class="w-full">
+            <div class="flex flex-col items-start gap-1 self-stretch">
+                <Tabs v-model:value="activeIndex" class="w-full gap-3">
                     <TabList>
                         <Tab 
                             v-for="(tab, index) in tabs" 
                             :key="tab.title"
                             :value="index"
                         >
-                            {{ tab.title }}
-                        </Tab>
+                            {{ `${tab.title}` }}
+                    </Tab>
                     </TabList>
+                    <TabPanels>
+                        <TabPanel :key="activeIndex" :value="activeIndex">
+                            <component 
+                                v-if="tabs[activeIndex].component"
+                                :is="tabs[activeIndex].component" 
+                                key="tabs[activeIndex].type" 
+                                :leadFront="props.leadFront"
+                                :isLoading="isLoading"
+                            />
+                        </TabPanel>
+                    </TabPanels>
                 </Tabs>
             </div>
         </div>
-        <div class="h-[1px] self-stretch bg-gray-200" />
-        <component 
-            v-if="tabs[activeIndex].component"
-            :is="tabs[activeIndex].component" 
-            key="tabs[activeIndex].type" 
-            :leadFront="props.leadFront"
-            :isLoading="isLoading"
-        />
     </div>
 
     <!-- edit contact info -->

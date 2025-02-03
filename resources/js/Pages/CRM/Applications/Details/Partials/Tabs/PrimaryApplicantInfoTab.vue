@@ -19,7 +19,8 @@ dayjs.extend(utc);
 dayjs.extend(timezone);
 
 const props = defineProps({
-    leadDetail: Object,
+    application: Object,
+    isLoading: Boolean,
 });
 
 const user = usePage().props.auth.user;
@@ -66,11 +67,11 @@ const submitForm = () => {
 
 </script>
 
-<!-- DataAndAppointmentTab.vue -->
+<!-- BasicInfoTab.vue -->
 <template>
     <div class="flex flex-col justify-center items-center gap-2 self-stretch">
         <div class="flex justify-between items-start self-stretch">
-            <span class="w-full text-gray-950 dark:text-gray-100 font-bold text-xxl break-words">{{ $t('public.data_and_appointment') }}</span>
+            <span class="w-full text-gray-950 dark:text-gray-100 font-bold text-xxl break-words">{{ $t('public.primary_applicant_info') }}</span>
             <Button
                 type="button"
                 iconOnly
@@ -86,60 +87,115 @@ const submitForm = () => {
 
         <div class="h-[1px] self-stretch bg-gray-200" />
 
-        <div v-if="props.leadDetail" class="w-full grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-5">
+        <div v-if="isLoading" class="w-full grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-5 animate-pulse">
             <div class="flex flex-col gap-2">
-                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.data_source') }}</div>
-                <div class="truncate text-gray-700 dark:text-gray-300 font-medium">{{ props.leadDetail?.data_source || '-' }}</div>
-            </div>
-            <div class="flex flex-col gap-2">
-                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.data_code') }}</div>
-                <div class="truncate text-gray-700 dark:text-gray-300 font-medium">{{ props.leadDetail?.data_code || '-' }}</div>
-            </div>
-            <div class="flex flex-col gap-2">
-                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.data_type') }}</div>
-                <div class="truncate text-gray-700 dark:text-gray-300 font-medium">{{ props.leadDetail?.data_type || '-' }}</div>
-            </div>
-            <div class="flex flex-col gap-2">
-                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.appointment_label') }}</div>
-                <div class="truncate text-gray-700 dark:text-gray-300 font-medium">{{ props.leadDetail?.appointment_label?.title || '-' }}</div>
-            </div>
-            <div class="flex flex-col gap-2">
-                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.appointment_start') }}</div>
-                <!-- <div class="truncate text-gray-700 dark:text-gray-300 font-medium">{{ props.leadDetail?.appointment_start_at ? formatToUserTimezone(props.leadDetail.appointment_start_at, user.timezone, true) : '-' }}</div> -->
-                <div class="truncate text-gray-700 dark:text-gray-300 font-medium">{{ props.leadDetail?.appointment_start_at ? props.leadDetail.appointment_start_at : '-' }}</div>
-            </div>
-            <div class="flex flex-col gap-2">
-                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.appointment_end') }}</div>
-                <!-- <div class="truncate text-gray-700 dark:text-gray-300 font-medium">{{ props.leadDetail?.appointment_end_at ? formatToUserTimezone(props.leadDetail.appointment_end_at, user.timezone, true) : '-' }}</div> -->
-                <div class="truncate text-gray-700 dark:text-gray-300 font-medium">{{ props.leadDetail?.appointment_end_at ? props.leadDetail.appointment_end_at : '-' }}</div>
-            </div>
-        </div>
-        <div v-else class="w-full grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-5 animate-pulse">
-            <div class="flex flex-col gap-2">
-                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.data_source') }}</div>
+                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.title') }}</div>
                 <div class="truncate text-gray-700 dark:text-gray-300 font-medium">
                     <div class="h-2 bg-gray-200 rounded-full w-48 my-2"></div>
                 </div>
             </div>
             <div class="flex flex-col gap-2">
-                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.data_code') }}</div>
+                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.name') }}</div>
                 <div class="h-2 bg-gray-200 rounded-full w-36 my-2"></div>
             </div>
             <div class="flex flex-col gap-2">
-                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.data_type') }}</div>
+                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.email') }}</div>
+                <div class="h-2 bg-gray-200 rounded-full w-36 my-2"></div>
+            </div>
+            <div class="flex flex-col gap-2">
+                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.address') }}</div>
+                <div class="h-2 bg-gray-200 rounded-full w-36 my-2"></div>
+            </div>
+            <div class="flex flex-col gap-2">
+                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.date_of_birth') }}</div>
+                <div class="h-2 bg-gray-200 rounded-full w-36 mt-2 mb-1"></div>
+            </div>
+            <div class="flex flex-col gap-2">
+                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.place_of_birth') }}</div>
+                <div class="h-2 bg-gray-200 rounded-full w-36 mt-2 mb-1"></div>
+            </div>
+            <div class="flex flex-col gap-2">
+                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.marital_status') }}</div>
                 <div class="h-3 bg-gray-200 rounded-full w-20 mt-1 mb-1.5"></div>
             </div>
             <div class="flex flex-col gap-2">
-                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.appointment_label') }}</div>
+                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.nationality') }}</div>
                 <div class="h-3 bg-gray-200 rounded-full w-36 mt-1 mb-1.5"></div>
             </div>
             <div class="flex flex-col gap-2">
-                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.appointment_start') }}</div>
-                <div class="h-2 bg-gray-200 rounded-full w-36 mt-2 mb-1"></div>
+                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.country') }}</div>
+                <div class="h-3 bg-gray-200 rounded-full w-36 mt-1 mb-1.5"></div>
             </div>
             <div class="flex flex-col gap-2">
-                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.appointment_end') }}</div>
-                <div class="h-2 bg-gray-200 rounded-full w-36 mt-2 mb-1"></div>
+                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.passport_number') }}</div>
+                <div class="h-3 bg-gray-200 rounded-full w-36 mt-1 mb-1.5"></div>
+            </div>
+            <div class="flex flex-col gap-2">
+                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.mobile_phone_number') }}</div>
+                <div class="h-3 bg-gray-200 rounded-full w-36 mt-1 mb-1.5"></div>
+            </div>
+            <div class="flex flex-col gap-2">
+                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.home_phone_number') }}</div>
+                <div class="h-3 bg-gray-200 rounded-full w-36 mt-1 mb-1.5"></div>
+            </div>
+            <div class="flex flex-col gap-2">
+                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.business_phone_number') }}</div>
+                <div class="h-3 bg-gray-200 rounded-full w-36 mt-1 mb-1.5"></div>
+            </div>
+        </div>
+
+        <div v-else class="w-full grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-5">
+            <div class="flex flex-col gap-2">
+                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.title') }}</div>
+                <div class="truncate text-gray-700 dark:text-gray-300 font-medium">{{ props.application?.acc_title ? props.application?.acc_title : '-' }}</div>
+            </div>
+            <div class="flex flex-col gap-2">
+                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.name') }}</div>
+                <div class="truncate text-gray-700 dark:text-gray-300 font-medium">{{ props.application?.acc_full_name || '-' }}</div>
+            </div>
+            <div class="flex flex-col gap-2">
+                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.email') }}</div>
+                <div class="truncate text-gray-700 dark:text-gray-300 font-medium">{{ props.application?.acc_email || '-' }}</div>
+            </div>
+            <div class="flex flex-col gap-2">
+                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.address') }}</div>
+                <div class="text-gray-700 dark:text-gray-300 font-medium break-all">{{ props.application?.acc_address || '-' }}</div>
+            </div>
+            <div class="flex flex-col gap-2">
+                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.date_of_birth') }}</div>
+                <div class="truncate text-gray-700 dark:text-gray-300 font-medium">{{ props.application?.acc_date_of_birth || '-' }}</div>
+            </div>
+            <div class="flex flex-col gap-2">
+                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.place_of_birth') }}</div>
+                <div class="text-gray-700 dark:text-gray-300 font-medium break-all">{{ props.application?.acc_place_of_birth || '-' }}</div>
+            </div>
+            <div class="flex flex-col gap-2">
+                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.marital_status') }}</div>
+                <div class="truncate text-gray-700 dark:text-gray-300 font-medium">{{ props.application?.acc_marital_status || '-' }}</div>
+            </div>
+            <div class="flex flex-col gap-2">
+                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.nationality') }}</div>
+                <div class="truncate text-gray-700 dark:text-gray-300 font-medium">{{ props.application?.acc_nationality || '-' }}</div>
+            </div>
+            <div class="flex flex-col gap-2">
+                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.country') }}</div>
+                <div class="truncate text-gray-700 dark:text-gray-300 font-medium">{{ props.application?.acc_country || '-' }}</div>
+            </div>
+            <div class="flex flex-col gap-2">
+                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.passport_number') }}</div>
+                <div class="truncate text-gray-700 dark:text-gray-300 font-medium">{{ props.application?.acc_passport_number || '-' }}</div>
+            </div>
+            <div class="flex flex-col gap-2">
+                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.mobile_phone_number') }}</div>
+                <div class="truncate text-gray-700 dark:text-gray-300 font-medium">{{ props.application?.acc_mobile_phone_number || '-' }}</div>
+            </div>
+            <div class="flex flex-col gap-2">
+                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.home_phone_number') }}</div>
+                <div class="truncate text-gray-700 dark:text-gray-300 font-medium">{{ props.application?.acc_home_phone_number || '-' }}</div>
+            </div>
+            <div class="flex flex-col gap-2">
+                <div class="text-gray-500 dark:text-gray-100 truncate">{{ $t('public.business_phone_number') }}</div>
+                <div class="truncate text-gray-700 dark:text-gray-300 font-medium">{{ props.application?.acc_business_phone_number || '-' }}</div>
             </div>
         </div>
     </div>

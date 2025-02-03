@@ -10,43 +10,46 @@ import Tab from 'primevue/tab';
 import TabPanels from 'primevue/tabpanels';
 import TabPanel from 'primevue/tabpanel';
 import { trans, wTrans } from "laravel-vue-i18n";
-import NotificationDetailInfo from '@/Pages/CRM/Notifications/NotificationDetails/Partials/NotificationDetailInfo.vue';
-import NotificationActionHistory from '@/Pages/CRM/Notifications/NotificationDetails/Partials/NotificationActionHistory.vue';
+import MemberDetailInfo from '@/Pages/CRM/Member/Details/Partials/MemberDetailInfo.vue';
+import MemberAccountInfo from '@/Pages/CRM/Member/Details/Partials/MemberAccountInfo.vue';
+import ApplicantAccountInfo from '@/Pages/CRM/Applications/Details/Partials/ApplicantAccountInfo.vue';
+import FinancialInvestmentInfo from '@/Pages/CRM/Applications/Details/Partials/FinancialInvestmentInfo.vue';
+import ApplicationActionHistory from '@/Pages/CRM/Applications/Details/Partials/ApplicationActionHistory.vue';
 
 const user = usePage().props.auth.user;
 
 const props = defineProps({
-    notification: Object,
+    application: Object,
 })
 
-const notificationDetail = ref();
-const isLoading = ref(false); 
+const applicationDetail = ref();
+const isLoading = ref(false);
 
-const getNotificationData = async () => {
+const getApplicationData = async () => {
     try {
         isLoading.value = true;
-        const response = await axios.get(`/crm/notification/getNotificationData?id=` + props.notification.id);
+        const response = await axios.get(`/crm/application/getApplicationData?id=` + props.application.id);
 
-        notificationDetail.value = response.data.notificationDetail;
+        applicationDetail.value = response.data.applicationDetail;
     } catch (error) {
-        console.error('Error get Sale Order Data:', error);
+        console.error('Error get network:', error);
     } finally {
         isLoading.value = false; // Set loading state to false after data fetch (success or failure)
     }
 };
 
-getNotificationData();
+getApplicationData();
 
 watchEffect(() => {
     if (usePage().props.toast !== null) {
-        getNotificationData();
+        getApplicationData();
     }
 });
 
 </script>
 
 <template>
-    <AuthenticatedLayout :title="$t('public.notification_details')">
+    <AuthenticatedLayout :title="$t('public.application_details')">
         <div class="w-full flex flex-col items-center gap-5">
             <!-- Breadcrumb -->
             <div class="flex flex-wrap md:flex-nowrap items-center gap-2 self-stretch text-gray-700 dark:text-gray-100">
@@ -55,25 +58,28 @@ watchEffect(() => {
                     type="button"
                     variant="primary-text"
                     size="sm"
-                    :href="route('crm.saleOrder.index')"
+                    :href="route('crm.application.index')"
                 >
-                    {{ $t('public.notification_listing') }}
+                    {{ $t('public.application_listing') }}
                 </Button>
                 <IconChevronRight
                     :size="16"
                     stroke-width="1.25"
                 />
-                <div class="flex px-4 py-2 items-center justify-center rounded text-sm font-medium">{{ `${props.notification.title}` }} - {{ $t('public.view_details') }}</div>
+                <div class="flex px-4 py-2 items-center justify-center rounded text-sm font-medium">{{ `${props.application.full_name}` }} - {{ $t('public.view_details') }}</div>
             </div>
 
             <div class="w-full h-full grid grid-cols-1 gap-5">
-                <NotificationDetailInfo
-                    :notificationDetail="notificationDetail"
+                <ApplicantAccountInfo
+                    :applicationDetail="applicationDetail"
                     :isLoading="isLoading"
                 />
-                <NotificationActionHistory
-                    :notification="props.notification"
+                <FinancialInvestmentInfo
+                    :applicationDetail="applicationDetail"
                     :isLoading="isLoading"
+                />
+                <ApplicationActionHistory
+                    :application="applicationDetail"
                 />
             </div>
         </div>

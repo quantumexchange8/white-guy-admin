@@ -36,15 +36,13 @@ const toggle = (event) => {
 };
 
 const items = ref([
-    // {
-    //     label: 'application_action_history',
-    //     icon: h(IconIdBadge2),
-    //     command: () => {
-    //         visible.value = true;
-    //         dialogType.value = 'application_action_history';
-    //         title.value = 'application_action_history';
-    //     },
-    // },
+    {
+        label: 'application_details',
+        icon: h(IconIdBadge2),
+        command: () => {
+            window.location.href = `/crm/application/detail/${props.application.id}`;
+        },
+    },
     {
         label: 'delete_application',
         icon: h(IconTrashX),
