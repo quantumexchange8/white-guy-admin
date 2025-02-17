@@ -31,13 +31,10 @@ const openConfirmDialog = () => {
 const form = useForm({
     username: '',
     password: '',
-	last_login: '',
     remember: false
 })
 
 const submit = () => {
-    form.last_login = setDateTimeWithOffset(true);
-
     form.post(route('login'), {
         onSuccess: () => form.reset('password'),
         onError: (response) => {

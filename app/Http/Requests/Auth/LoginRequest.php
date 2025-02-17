@@ -30,7 +30,6 @@ class LoginRequest extends FormRequest
         return [
             'username' => ['required', 'string'],
             'password' => ['required', 'string'],
-            'last_login' => ['required', 'date_format:Y-m-d H:i:s.uO'],
         ];
     }
 

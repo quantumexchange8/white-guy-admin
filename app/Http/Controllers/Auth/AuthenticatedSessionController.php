@@ -30,20 +30,20 @@ class AuthenticatedSessionController extends Controller
     /**
      * Handle an incoming authentication request.
      */
-    public function store(Request $request): RedirectResponse
+    public function store(LoginRequest $request): RedirectResponse
     {
-        // $request->authenticate();
+        $request->authenticate();
 
         $request->session()->regenerate();
 
-        // if (auth()->check()) {
-        //     $user = User::where('username', $request->username)->first();
+        if (auth()->check()) {
+            $user = User::where('username', $request->username)->first();
 
-        //     $user->update([
-        //         'last_login' => $request->last_login,
-        //     ]);
-        //     $user->save();
-        // }
+            $user->update([
+                'last_login' => Carbon::now(),
+            ]);
+            $user->save();
+        }
 
         return redirect()->intended(RouteServiceProvider::HOME);
     }
